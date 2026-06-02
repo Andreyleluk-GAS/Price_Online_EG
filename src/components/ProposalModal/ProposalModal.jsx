@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { formatPrice, formatMonths, formatDate } from '../../utils/formatters';
 import styles from './ProposalModal.module.css';
@@ -11,6 +11,15 @@ export default function ProposalModal({
   fuelType, selectedExtras, settings,
 }) {
   const extrasList = selectedExtras ? Object.values(selectedExtras) : [];
+  const [toastMessage, setToastMessage] = useState(null);
+
+  useEffect(() => {
+    if (!toastMessage) return;
+    const timer = setTimeout(() => {
+      setToastMessage(null);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, [toastMessage]);
 
   const baseOptions = useMemo(() => {
     const baseOptionsPropane = ["Мультиклапан европа", "Магистраль сталь", "Заправочное устройство", "Размещение баллона - внутри"];
@@ -91,9 +100,9 @@ export default function ProposalModal({
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(getPlainText());
-      alert('Текст скопирован!');
+      setToastMessage('Текст скопирован!');
     } catch {
-      alert('Не удалось скопировать');
+      setToastMessage('Не удалось скопировать');
     }
   }
 
@@ -214,6 +223,17 @@ export default function ProposalModal({
             Скопировать текст
           </button>
         </div>
+
+        {toastMessage && (
+          <div className={styles.toast}>
+            {toastMessage === 'Текст скопирован!' && (
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={styles.toastIcon}>
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            )}
+            <span>{toastMessage}</span>
+          </div>
+        )}
       </div>
     </div>,
     document.body
