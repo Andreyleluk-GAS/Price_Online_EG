@@ -86,6 +86,7 @@
   font-size: 0.9rem;
   color: var(--accent);
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .changeButton {
@@ -135,5 +136,33 @@
 @media (min-width: 640px) {
   .buttonWrap {
     align-self: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .selectedContainer {
+    padding: 10px 12px;
+    gap: 12px;
+  }
+  .rowContainer {
+    gap: 6px;
+  }
+  .selectedName {
+    font-size: 0.9rem;
+  }
+  .selectedPrice {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .rowContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  
+  .selectedPrice {
+    align-self: flex-end;
   }
 }
