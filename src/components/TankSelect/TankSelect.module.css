@@ -1,0 +1,139 @@
+.section {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.selectButton {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 1rem;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  font-family: inherit;
+}
+
+.selectButton:hover {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+}
+
+.selectButton:active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.selectedContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px 16px; /* Compact padding */
+  background: var(--bg-card);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 640px) {
+  .selectedContainer {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.selectedInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rowContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .rowContainer {
+    align-items: center;
+  }
+}
+
+.selectedName {
+  font-weight: 600;
+  color: var(--text-primary);
+  word-wrap: break-word;
+}
+
+.selectedPrice {
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.changeButton {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.changeButton:hover {
+  opacity: 0.9;
+}
+
+.changeButton:active {
+  transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 639px) {
+  .selectedContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  
+  .changeButton {
+    width: 100%;
+  }
+}
+
+.buttonWrap {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .buttonWrap {
+    align-self: center;
+  }
+}
