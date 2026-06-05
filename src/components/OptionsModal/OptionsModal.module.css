@@ -28,21 +28,24 @@
     0 0 0 1px rgba(148, 163, 184, 0.1);
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: calc(100% - 32px);
   max-width: 540px;
   max-height: 85vh;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   animation: modalIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
   overflow: hidden;
 }
 
 @keyframes modalIn {
   from {
-    transform: translateY(24px) scale(0.97);
+    transform: translate(-50%, -40%) scale(0.97);
     opacity: 0;
   }
   to {
-    transform: translateY(0) scale(1);
+    transform: translate(-50%, -50%) scale(1);
     opacity: 1;
   }
 }
@@ -386,14 +389,14 @@
 
 @media (max-width: 768px) {
   .modal {
-    max-height: 90vh;
-    border-radius: 16px 16px 0 0;
-    align-self: flex-end;
+    max-height: 100dvh;
+    border-radius: 16px;
+    width: calc(100% - 32px);
   }
 
   .overlay {
     padding: 0;
-    align-items: flex-end;
+    display: block; /* Remove flex since modal is absolute */
   }
 
   .footer {
