@@ -15,6 +15,7 @@ export default function OptionsModal({
   selectedExtras, onSaveExtras,
   settings,
   isMetan,
+  selectedSystem,
 }) {
   // Local state copies — commit on Apply, revert on Cancel
   const [localDiscount, setLocalDiscount] = useState(discountMontage);
@@ -49,8 +50,16 @@ export default function OptionsModal({
     }).filter((item) => {
       if (!item || !item.fuelScope) return true;
       return item.fuelScope === 'BOTH' || item.fuelScope === gboFuelType;
+    }).filter((item) => {
+      const tags = item.name ? (item.name.match(/\[(.*?)\]/g) || []) : [];
+      if (tags.length === 0) return true;
+
+      const systemCodePrefix = selectedSystem?.id?.substring(0, 3);
+      if (!systemCodePrefix) return false;
+
+      return tags.some(tag => tag.includes(systemCodePrefix));
     });
-  }, [priceItems, gboFuelType, settings?.price_gibdd_docs]);
+  }, [priceItems, gboFuelType, settings?.price_gibdd_docs, selectedSystem]);
 
   function toggleLocalExtra(item) {
     setLocalExtras((prev) => {
@@ -196,7 +205,7 @@ export default function OptionsModal({
                   </div>
                   <div className={styles.checkLabelExtra}>
                     <div className={styles.extraTextBlock}>
-                      <span className={styles.optionName}>{item.name}</span>
+                      <span className={styles.optionName}>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
                       {item.codeDetails && (
                         <span className={styles.extraMeta}>{item.codeDetails}</span>
                       )}

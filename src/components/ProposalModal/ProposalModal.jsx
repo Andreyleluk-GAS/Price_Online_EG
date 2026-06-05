@@ -34,6 +34,14 @@ export default function ProposalModal({
       }
       return baseOptionsMethane;
     }
+
+    const hasBottomTank = (extrasList || []).some(
+      (item) => (item?.name || '').includes('Установка баллона снизу') || (item?.id && typeof item.id === 'string' && item.id.includes('PDOP') && item.id.includes('001'))
+    );
+    if (hasBottomTank) {
+      return baseOptionsPropane.filter(opt => opt !== "Размещение баллона - внутри");
+    }
+
     return baseOptionsPropane;
   }, [gboFuelType, extrasList]);
 
@@ -78,12 +86,12 @@ export default function ProposalModal({
       if (regularExtras.length > 0) {
         text += `🔧 Доп. опции:\n`;
         for (const item of regularExtras) {
-          text += `  📋 ${item.name}: Включено\n`;
+          text += `  📋 ${(item.name || '').replace(/\[.*?\]/g, '').trim()}: Включено\n`;
         }
       }
       
       for (const item of negativeExtras) {
-        text += `🏷 ${item.name}: ${formatPrice(item.price)}\n`;
+        text += `🏷 ${(item.name || '').replace(/\[.*?\]/g, '').trim()}: ${formatPrice(item.price)}\n`;
       }
     }
 
@@ -98,10 +106,44 @@ export default function ProposalModal({
   }
 
   async function handleCopy() {
+    const text = getPlainText();
+    
+    // Attempt modern Clipboard API first
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        setToastMessage('Текст скопирован!');
+        return;
+      } catch (err) {
+        console.warn('Clipboard API failed, trying fallback...', err);
+      }
+    }
+    
+    // Fallback for non-secure contexts (e.g., local network HTTP)
     try {
-      await navigator.clipboard.writeText(getPlainText());
-      setToastMessage('Текст скопирован!');
-    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      // Prevent scrolling to bottom
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.position = "fixed";
+      // Ensure invisible
+      textArea.style.opacity = "0";
+      
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        setToastMessage('Текст скопирован!');
+      } else {
+        setToastMessage('Не удалось скопировать');
+      }
+    } catch (err) {
+      console.error('Fallback copy failed', err);
       setToastMessage('Не удалось скопировать');
     }
   }
@@ -176,7 +218,7 @@ export default function ProposalModal({
           )}
           {extrasList.map((item) => (
             <div key={item.id} className={styles.rowSub}>
-              <span>{item.name}</span>
+              <span>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
               <span>{item.price != null ? `+${formatPrice(item.price)}` : 'По запросу'}</span>
             </div>
           ))}

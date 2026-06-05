@@ -98,6 +98,7 @@ export default function App() {
               />
 
               <Options
+                selectedSystem={calc.selectedSystem}
                 cylinders={calc.cylinders}
                 gboFuelType={calc.gboFuelType}
                 isMetan={calc.gboFuelType === 'METAN'}

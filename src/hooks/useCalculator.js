@@ -62,13 +62,22 @@ export function useCalculator(settings, priceItems) {
           return;
         }
 
-        if (item.fuelScope === 'BOTH' || item.fuelScope === gboFuelType) {
-          nextExtras[id] = item;
+        if (item.fuelScope !== 'BOTH' && item.fuelScope !== gboFuelType) {
+          return;
         }
+
+        const tags = item.name ? (item.name.match(/\[(.*?)\]/g) || []) : [];
+        if (tags.length > 0) {
+          const systemCodePrefix = selectedSystem?.id?.substring(0, 3);
+          if (!systemCodePrefix) return;
+          if (!tags.some(tag => tag.includes(systemCodePrefix))) return;
+        }
+
+        nextExtras[id] = item;
       });
       return nextExtras;
     });
-  }, [gboFuelType]);
+  }, [gboFuelType, selectedSystem]);
 
   // The effect for 'cylinders' was merged with 'gboFuelType' above to preserve the default tank logic.
 

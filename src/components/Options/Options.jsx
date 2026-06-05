@@ -11,6 +11,7 @@ export default function Options({
   priceItems,
   selectedExtras, onSaveExtras,
   settings,
+  selectedSystem,
 }) {
   const [showModal, setShowModal] = useState(false);
 
@@ -41,7 +42,7 @@ export default function Options({
   }
   for (const item of selectedExtrasList) {
     summaryItems.push({
-      label: item.name,
+      label: (item.name || '').replace(/\[.*?\]/g, '').trim(),
       value: item.price != null ? `+${formatPrice(item.price)}` : 'По запросу',
       type: 'extra'
     });
@@ -96,6 +97,7 @@ export default function Options({
         onSaveExtras={onSaveExtras}
         settings={settings}
         isMetan={gboFuelType === 'METAN'}
+        selectedSystem={selectedSystem}
       />
     </section>
   );
