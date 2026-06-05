@@ -5,11 +5,11 @@ import styles from './Header.module.css';
 export default function Header({ settings, showAdmin, onToggleAdmin }) {
   return (
     <header className={styles.header}>
-      {/* Контейнер шапки с позиционированием для центрирования логотипа */}
-      <div className={styles.inner} style={{ position: 'relative', justifyContent: 'flex-end' }}>
+      {/* Контейнер шапки с Flexbox для выравнивания */}
+      <div className={styles.inner}>
         
-        {/* Абсолютное центрирование логотипа (строго по центру экрана) */}
-        <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}>
+        {/* Логотип по левому краю */}
+        <div className={styles.logoWrapper}>
           <img 
             src={logo} 
             alt="Логотип калькулятора" 
