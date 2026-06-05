@@ -109,12 +109,7 @@ export default function ProposalModal({
   return createPortal(
     <div className={`${styles.overlay} ${gboFuelType === 'METAN' ? 'theme-metan' : ''}`} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.closeBtn} onClick={onClose} aria-label="Закрыть">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
+
 
         <div className={styles.header}>
           <h2 className={styles.headerTitle}>Коммерческое предложение</h2>
@@ -220,7 +215,10 @@ export default function ProposalModal({
               <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
               <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
             </svg>
-            Скопировать текст
+            Скопировать
+          </button>
+          <button className={styles.closeBtnSecondary} onClick={onClose}>
+            Закрыть
           </button>
         </div>
 

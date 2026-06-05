@@ -24,31 +24,10 @@
   animation: scaleIn 0.25s ease;
 }
 
-.closeBtn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: #f1f5f9;
-  border: none;
-  border-radius: 8px;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #64748b;
-  transition: all 0.15s;
-}
-
-.closeBtn:hover {
-  background: #e2e8f0;
-  color: #1a1a2e;
-}
-
 .header {
   padding: 20px 20px 12px;
   border-bottom: 2px solid #f1f5f9;
+  text-align: center;
 }
 
 .headerTitle {
@@ -186,11 +165,14 @@
 .actions {
   padding: 12px 20px 20px;
   display: flex;
-  justify-content: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .copyBtn {
-  padding: 12px 24px;
+  flex: 1;
+  padding: 0;
+  min-height: 44px;
   background: #1a1a2e;
   color: #ffffff;
   font-weight: 600;
@@ -199,6 +181,7 @@
   border-radius: 10px;
   cursor: pointer;
   display: inline-flex;
+  justify-content: center;
   align-items: center;
   gap: 8px;
   transition: all 0.15s;
@@ -208,6 +191,27 @@
   background: #2d2d4e;
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.closeBtnSecondary {
+  flex: 1;
+  padding: 0;
+  min-height: 44px;
+  background: #f1f5f9;
+  color: #1a1a2e;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.15s;
+}
+
+.closeBtnSecondary:hover {
+  background: #e2e8f0;
 }
 
 @keyframes fadeIn {
