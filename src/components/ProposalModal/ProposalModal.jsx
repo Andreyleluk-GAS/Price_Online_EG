@@ -61,7 +61,7 @@ export default function ProposalModal({
   if (!show) return null;
 
   const carLabel = selectedCar
-    ? `${selectedCar.brand} ${selectedCar.model}`
+    ? (selectedCar.model ? `${selectedCar.brand} ${selectedCar.model}` : selectedCar.brand)
     : 'Не указан';
 
   const today = formatDate(new Date().toISOString());

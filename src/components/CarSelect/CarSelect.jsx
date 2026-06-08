@@ -53,7 +53,11 @@ export default function CarSelect({
     const make = e.target.value;
     setSelectedMake(make);
     setSelectedModel('');
-    onCarSelect(null);
+    if (make) {
+      onCarSelect({ brand: make });
+    } else {
+      onCarSelect(null);
+    }
   }
 
   // Handle Model change
@@ -70,7 +74,11 @@ export default function CarSelect({
         }
       }
     } else {
-      onCarSelect(null);
+      if (selectedMake) {
+        onCarSelect({ brand: selectedMake });
+      } else {
+        onCarSelect(null);
+      }
     }
   }
 
