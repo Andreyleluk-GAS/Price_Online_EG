@@ -189,6 +189,27 @@
   font-weight: 700;
 }
 
+.savingsResultBlock {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 12px;
+}
+
+.savingsResultRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.savingsResultHighlight {
+  color: var(--accent);
+  font-weight: 800;
+}
+
 .actions {
   padding: 12px 20px 20px;
   display: flex;

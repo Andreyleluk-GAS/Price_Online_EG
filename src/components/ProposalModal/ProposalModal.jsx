@@ -263,13 +263,15 @@ export default function ProposalModal({
                 <span>Затраты на газ</span>
                 <span>{formatPrice(gasCost)}/мес</span>
               </div>
-              <div className={styles.savingsRow}>
-                <span>Экономия</span>
-                <span className={styles.savingsHighlight}>{formatPrice(monthlySavings)}/мес</span>
-              </div>
-              <div className={styles.savingsRow}>
-                <span>Окупаемость</span>
-                <span className={styles.paybackHighlight}>{formatMonths(paybackMonths)}</span>
+              <div className={styles.savingsResultBlock}>
+                <div className={styles.savingsResultRow}>
+                  <span>Экономия</span>
+                  <span className={styles.savingsResultHighlight}>{formatPrice(monthlySavings)}/мес</span>
+                </div>
+                <div className={styles.savingsResultRow}>
+                  <span>Окупаемость</span>
+                  <span className={styles.savingsResultHighlight}>{formatMonths(paybackMonths)}</span>
+                </div>
               </div>
             </div>
           </div>
