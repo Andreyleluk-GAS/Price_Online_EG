@@ -157,11 +157,7 @@ export default function CarSelect({
               key={type}
               type="button"
               className={`${styles.pill} ${
-                gboFuelType === type
-                  ? type === 'METAN'
-                    ? styles.pillActiveMetan
-                    : styles.pillActive
-                  : ''
+                gboFuelType === type ? styles.pillActive : ''
               }`}
               onClick={() => onFuelTypeChange(type)}
             >
@@ -179,7 +175,7 @@ export default function CarSelect({
               key={n}
               type="button"
               id={`cyl-${n}`}
-              className={`${styles.pill} ${cylinders === n ? (gboFuelType === 'METAN' ? styles.pillActiveMetan : styles.pillActive) : ''}`}
+              className={`${styles.pill} ${cylinders === n ? styles.pillActive : ''}`}
               onClick={() => onCylindersChange(n)}
             >
               {n} цил.

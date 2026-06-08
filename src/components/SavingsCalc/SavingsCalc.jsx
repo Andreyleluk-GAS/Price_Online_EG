@@ -62,24 +62,29 @@ export default function SavingsCalc({
       </div>
 
       <div className={styles.results}>
-        <div className={styles.resultRow}>
-          <span className={styles.resultLabel}>Затраты на бензин:</span>
-          <span className={styles.resultValue}>{formatPrice(petrolCost)}/мес</span>
+        <div className={styles.expensesBox}>
+          <div className={styles.resultRow}>
+            <span className={styles.resultLabel}>Затраты на бензин:</span>
+            <span className={styles.resultValue}>{formatPrice(petrolCost)}/мес</span>
+          </div>
+          <div className={styles.resultRow}>
+            <span className={styles.resultLabel}>Затраты на газ:</span>
+            <span className={styles.resultValue}>{formatPrice(gasCost)}/мес</span>
+          </div>
         </div>
-        <div className={styles.resultRow}>
-          <span className={styles.resultLabel}>Затраты на газ:</span>
-          <span className={styles.resultValue}>{formatPrice(gasCost)}/мес</span>
-        </div>
-        <div className={styles.divider} />
-        <div className={`${styles.resultRow} ${styles.savingsRow}`}>
-          <span className={styles.resultLabel}>Экономия:</span>
-          <span className={styles.savingsValue}>
-            {monthlySavings > 0 ? formatPrice(monthlySavings) : '0 ₽'}/мес
-          </span>
-        </div>
-        <div className={styles.resultRow}>
-          <span className={styles.resultLabel}>Окупаемость:</span>
-          <span className={styles.paybackValue}>{formatMonths(paybackMonths)}</span>
+        
+        <div className={styles.highlightsBox}>
+          <div className={styles.highlightItem}>
+            <span className={styles.highlightLabel}>Экономия</span>
+            <span className={styles.savingsValue}>
+              {monthlySavings > 0 ? formatPrice(monthlySavings).replace(' ₽', '') : '0'} 
+              <span className={styles.perMonth}>₽/мес</span>
+            </span>
+          </div>
+          <div className={styles.highlightItem}>
+            <span className={styles.highlightLabel}>Окупаемость</span>
+            <span className={styles.paybackValue}>{formatMonths(paybackMonths)}</span>
+          </div>
         </div>
       </div>
     </section>

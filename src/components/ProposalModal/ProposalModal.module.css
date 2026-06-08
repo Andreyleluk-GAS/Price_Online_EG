@@ -2,8 +2,7 @@
   position: fixed;
   inset: 0;
   z-index: 10000;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
+  background: rgba(28, 28, 30, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,20 +11,26 @@
 }
 
 .modal {
-  background: #ffffff;
-  color: #1a1a2e;
+  background: var(--bg-secondary);
+  color: var(--text-primary);
   border-radius: 16px;
   width: 100%;
   max-width: 560px;
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-lg);
   animation: scaleIn 0.25s ease;
 }
 
+.captureArea {
+  padding: 24px;
+  background-color: #ffffff;
+  border-radius: 16px 16px 0 0;
+}
+
 .header {
-  padding: 20px 20px 12px;
+  padding: 0 0 16px 0;
   border-bottom: 2px solid #f1f5f9;
   text-align: center;
 }
@@ -33,17 +38,28 @@
 .headerTitle {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: var(--text-primary);
 }
 
 .headerDate {
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
 .body {
-  padding: 12px 20px;
+  padding: 16px 0 0 0;
+  position: relative;
+}
+
+.watermark {
+  position: absolute;
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.08; /* semi-transparent */
+  pointer-events: none;
+  z-index: 0;
 }
 
 .row {
@@ -52,17 +68,19 @@
   align-items: center;
   padding: 6px 0;
   border-bottom: 1px solid #f1f5f9;
+  position: relative;
+  z-index: 1;
 }
 
 .label {
   font-weight: 600;
-  color: #475569;
+  color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
 .value {
   font-weight: 600;
-  color: #1a1a2e;
+  color: var(--text-primary);
   font-size: 0.9rem;
   text-align: right;
 }
@@ -72,13 +90,17 @@
   justify-content: space-between;
   padding: 3px 0 3px 20px;
   font-size: 0.85rem;
-  color: #64748b;
-  border-bottom: 1px solid #f8fafc;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--bg-card-hover);
+  position: relative;
+  z-index: 1;
 }
 
 .baseOptions {
   padding: 0 0 6px 20px;
   border-bottom: 1px solid #f8fafc;
+  position: relative;
+  z-index: 1;
 }
 
 .baseOptionsList {
@@ -86,7 +108,7 @@
   padding: 0;
   list-style: none;
   font-size: 0.8rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   line-height: 1.25;
 }
 
@@ -100,7 +122,7 @@
   content: "•";
   position: absolute;
   left: 0;
-  color: #cbd5e1;
+  color: var(--border);
 }
 
 .discountText {
@@ -115,12 +137,14 @@
   padding: 12px 0;
   margin-top: 4px;
   border-top: 2px solid #e2e8f0;
+  position: relative;
+  z-index: 1;
 }
 
 .totalLabel {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #1a1a2e;
+  color: var(--text-primary);
 }
 
 .totalValue {
@@ -132,15 +156,18 @@
 .savingsBlock {
   margin-top: 12px;
   padding: 12px;
-  background: #f8fafc;
+  background: var(--accent);
   border-radius: 12px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--accent);
+  color: #ffffff;
+  position: relative;
+  z-index: 1;
 }
 
 .savingsTitle {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #475569;
+  color: #ffffff;
   margin-bottom: 12px;
 }
 
@@ -149,16 +176,16 @@
   justify-content: space-between;
   padding: 3px 0;
   font-size: 0.85rem;
-  color: #64748b;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .savingsHighlight {
-  color: var(--accent);
+  color: #ffffff;
   font-weight: 700;
 }
 
 .paybackHighlight {
-  color: #d97706;
+  color: #ffffff;
   font-weight: 700;
 }
 
@@ -173,7 +200,7 @@
   flex: 1;
   padding: 0;
   min-height: 44px;
-  background: #1a1a2e;
+  background: var(--text-primary);
   color: #ffffff;
   font-weight: 600;
   font-size: 0.9rem;
@@ -188,7 +215,7 @@
 }
 
 .copyBtn:hover {
-  background: #2d2d4e;
+  background: var(--text-secondary);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
@@ -197,8 +224,8 @@
   flex: 1;
   padding: 0;
   min-height: 44px;
-  background: #f1f5f9;
-  color: #1a1a2e;
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
   font-weight: 600;
   font-size: 0.9rem;
   border: none;
@@ -211,7 +238,7 @@
 }
 
 .closeBtnSecondary:hover {
-  background: #e2e8f0;
+  background: var(--border);
 }
 
 @keyframes fadeIn {
@@ -253,8 +280,11 @@
 }
 
 @media (max-width: 600px) {
+  .captureArea {
+    padding: 16px;
+  }
   .header {
-    padding: 12px 16px 8px;
+    padding: 0 0 12px 0;
   }
   .headerTitle {
     font-size: 1.1rem;
@@ -263,7 +293,7 @@
     margin-top: 0;
   }
   .body {
-    padding: 8px 16px;
+    padding: 8px 0 0 0;
   }
   .row {
     padding: 4px 0;

@@ -162,6 +162,8 @@ export default function App() {
         paybackMonths={calc.paybackMonths}
         fuelType={calc.fuelType}
         selectedExtras={calc.selectedExtras}
+        consumption={calc.consumption}
+        mileage={calc.mileage}
       />
     </div>
   );

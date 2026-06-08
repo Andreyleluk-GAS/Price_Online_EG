@@ -144,19 +144,6 @@
   color: var(--accent);
 }
 
-.pillActiveMetan {
-  background: rgba(59, 130, 246, 0.1); /* blue-50 equivalent */
-  border-color: #3b82f6; /* blue-500 */
-  color: #1d4ed8; /* blue-700 */
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.2);
-}
-
-.pillActiveMetan:hover {
-  background: rgba(59, 130, 246, 0.15);
-  border-color: #3b82f6;
-  color: #1d4ed8;
-}
-
 .warning {
   display: flex;
   align-items: center;

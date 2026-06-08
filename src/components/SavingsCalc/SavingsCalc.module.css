@@ -68,11 +68,17 @@
 }
 
 .results {
-  background: var(--accent-glow);
-  border: 1px solid var(--accent-glow);
-  border-radius: var(--radius);
-  padding: 20px 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(28, 28, 30, 0.03);
+  padding: 0;
   animation: fadeIn 0.3s ease;
+  overflow: hidden;
+}
+
+.expensesBox {
+  padding: 24px;
 }
 
 .resultRow {
@@ -82,36 +88,82 @@
   padding: 8px 0;
 }
 
+.resultRow:first-child {
+  padding-top: 0;
+}
+
+.resultRow:last-child {
+  padding-bottom: 0;
+}
+
 .resultLabel {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .resultValue {
   font-weight: 600;
   font-size: 1rem;
+  color: var(--text-primary);
 }
 
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin: 8px 0;
+.highlightsBox {
+  background: var(--accent-light);
+  border-top: 1px solid var(--accent-border-light);
+  padding: 24px;
+  display: flex;
+  gap: 20px;
 }
 
-.savingsRow {
-  padding: 10px 0;
+@media (max-width: 640px) {
+  .highlightsBox {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.highlightItem {
+  flex: 1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--accent-border-light);
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+}
+
+.highlightLabel {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .savingsValue {
-  font-weight: 700;
-  font-size: 1.15rem;
+  font-weight: 800;
+  font-size: 1.6rem;
   color: var(--accent);
+  line-height: 1;
+  display: flex;
+  align-items: baseline;
+}
+
+.perMonth {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-left: 4px;
 }
 
 .paybackValue {
-  font-weight: 600;
-  font-size: 1rem;
-  color: var(--warning);
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--text-primary);
+  line-height: 1;
 }
 
 @keyframes fadeIn {

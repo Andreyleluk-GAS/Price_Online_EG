@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import html2canvas from 'html2canvas';
 import { formatPrice, formatMonths, formatDate } from '../../utils/formatters';
+import { EliteGasLogo } from '../EliteGasLogo';
 import styles from './ProposalModal.module.css';
 
 export default function ProposalModal({
@@ -9,9 +11,11 @@ export default function ProposalModal({
   discountMontage, discount, gibddDocs, gibddPrice,
   totalPrice, petrolCost, gasCost, monthlySavings, paybackMonths,
   fuelType, selectedExtras, settings,
+  consumption, mileage,
 }) {
   const extrasList = selectedExtras ? Object.values(selectedExtras) : [];
   const [toastMessage, setToastMessage] = useState(null);
+  const captureRef = useRef(null);
 
   useEffect(() => {
     if (!toastMessage) return;
@@ -97,6 +101,7 @@ export default function ProposalModal({
 
     text += `\n💰 ИТОГО: ${totalPrice != null ? formatPrice(totalPrice) : 'По запросу'}\n`;
     text += `\n📊 Окупаемость:\n`;
+    text += `  Расчет при расходе ${consumption} л/100 км и пробеге ${mileage} км/мес\n`;
     text += `  Затраты на бензин: ${formatPrice(petrolCost)}/мес\n`;
     text += `  Затраты на газ: ${formatPrice(gasCost)}/мес\n`;
     text += `  Экономия: ${formatPrice(monthlySavings)}/мес\n`;
@@ -106,45 +111,56 @@ export default function ProposalModal({
   }
 
   async function handleCopy() {
-    const text = getPlainText();
+    if (!captureRef.current) return;
     
-    // Attempt modern Clipboard API first
-    if (navigator.clipboard && window.isSecureContext) {
-      try {
-        await navigator.clipboard.writeText(text);
-        setToastMessage('Текст скопирован!');
-        return;
-      } catch (err) {
-        console.warn('Clipboard API failed, trying fallback...', err);
-      }
-    }
+    setToastMessage('Формируем картинку...');
     
-    // Fallback for non-secure contexts (e.g., local network HTTP)
     try {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      // Prevent scrolling to bottom
-      textArea.style.top = "0";
-      textArea.style.left = "0";
-      textArea.style.position = "fixed";
-      // Ensure invisible
-      textArea.style.opacity = "0";
+      const canvas = await html2canvas(captureRef.current, {
+        scale: 2, // High resolution
+        useCORS: true,
+        backgroundColor: '#FFFFFF', // Ensure white background
+      });
       
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      const successful = document.execCommand('copy');
-      document.body.removeChild(textArea);
-      
-      if (successful) {
-        setToastMessage('Текст скопирован!');
-      } else {
-        setToastMessage('Не удалось скопировать');
-      }
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          setToastMessage('Ошибка при создании картинки');
+          return;
+        }
+        
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            const item = new ClipboardItem({ 'image/png': blob });
+            await navigator.clipboard.write([item]);
+            setToastMessage('Картинка скопирована!');
+          } else {
+            // Fallback: download if clipboard API is not fully supported
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Предложение_ГБО.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            setToastMessage('Картинка сохранена (скачана)!');
+          }
+        } catch (err) {
+          console.error('Clipboard copy failed, downloading instead...', err);
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `Предложение_ГБО.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          setToastMessage('Картинка сохранена (скачана)!');
+        }
+      }, 'image/png');
     } catch (err) {
-      console.error('Fallback copy failed', err);
-      setToastMessage('Не удалось скопировать');
+      console.error('html2canvas error:', err);
+      setToastMessage('Ошибка при создании картинки');
     }
   }
 
@@ -152,101 +168,109 @@ export default function ProposalModal({
     <div className={`${styles.overlay} ${gboFuelType === 'METAN' ? 'theme-metan' : ''}`} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
 
-
-        <div className={styles.header}>
-          <h2 className={styles.headerTitle}>Коммерческое предложение</h2>
-          <p className={styles.headerDate}>{today}</p>
-        </div>
-
-        <div className={styles.body}>
-          <div className={styles.row}>
-            <span className={styles.label}>🚗 Автомобиль</span>
-            <span className={styles.value}>{carLabel} ({cylinders || '?'} цил.)</span>
+        <div ref={captureRef} className={styles.captureArea}>
+          <div className={styles.header}>
+            <h2 className={styles.headerTitle}>Коммерческое предложение</h2>
+            <p className={styles.headerDate}>{today}</p>
           </div>
 
-          <div className={styles.row}>
-            <span className={styles.label}>⛽ Тип газа</span>
-            <span className={styles.value}>{gboFuelType === 'METAN' ? 'МЕТАН' : 'ПРОПАН'}</span>
-          </div>
-
-          <div className={styles.row}>
-            <span className={styles.label}>⚙️ Система ГБО</span>
-            <span className={styles.value}>{selectedSystem?.name || '—'}</span>
-          </div>
-          <div className={styles.rowSub}>
-            <span>Базовая цена</span>
-            <span>{selectedSystem?.price != null ? formatPrice(selectedSystem.price) : 'По запросу'}</span>
-          </div>
-          {selectedSystem && baseOptions && Array.isArray(baseOptions) && (
-            <div className={styles.baseOptions}>
-              <ul className={styles.baseOptionsList}>
-                {baseOptions.map((opt, i) => (
-                  <li key={i}>{opt}</li>
-                ))}
-              </ul>
+          <div className={styles.body}>
+            <div className={styles.watermark}>
+              <EliteGasLogo size={256} />
             </div>
-          )}
 
-          <div className={styles.row}>
-            <span className={styles.label}>🛢 Баллон</span>
-            <span className={styles.value}>{selectedTank?.name || '—'}</span>
-          </div>
-          {selectedTank && selectedTank.price > 0 && (
-            <div className={styles.rowSub}>
-              <span>Доплата</span>
-              <span>+{formatPrice(selectedTank.price)}</span>
-            </div>
-          )}
-
-          {(discountMontage || gibddDocs || extrasList.length > 0) && (
             <div className={styles.row}>
-              <span className={styles.label}>📋 Дополнительно</span>
-              <span></span>
+              <span className={styles.label}>🚗 Автомобиль</span>
+              <span className={styles.value}>{carLabel} ({cylinders || '?'} цил.)</span>
             </div>
-          )}
-          {discountMontage && (
-            <div className={styles.rowSub}>
-              <span>Скидка «Гибкий график»</span>
-              <span className={styles.discountText}>-{formatPrice(discount)}</span>
-            </div>
-          )}
-          {gibddDocs && (
-            <div className={styles.rowSub}>
-              <span>ГИБДД (документы)</span>
-              <span>{Number(settings?.price_gibdd_docs) === 0 ? 'Включено' : `+${formatPrice(Number(settings?.price_gibdd_docs) || 0)}`}</span>
-            </div>
-          )}
-          {extrasList.map((item) => (
-            <div key={item.id} className={styles.rowSub}>
-              <span>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
-              <span>{item.price != null ? `+${formatPrice(item.price)}` : 'По запросу'}</span>
-            </div>
-          ))}
 
-          <div className={styles.totalRow}>
-            <span className={styles.totalLabel}>ИТОГО</span>
-            <span className={styles.totalValue}>
-              {totalPrice != null ? formatPrice(totalPrice) : 'По запросу'}
-            </span>
-          </div>
+            <div className={styles.row}>
+              <span className={styles.label}>⛽ Тип газа</span>
+              <span className={styles.value}>{gboFuelType === 'METAN' ? 'МЕТАН' : 'ПРОПАН'}</span>
+            </div>
 
-          <div className={styles.savingsBlock}>
-            <h3 className={styles.savingsTitle}>📊 Расчёт окупаемости</h3>
-            <div className={styles.savingsRow}>
-              <span>Затраты на бензин (АИ-{fuelType})</span>
-              <span>{formatPrice(petrolCost)}/мес</span>
+            <div className={styles.row}>
+              <span className={styles.label}>⚙️ Система ГБО</span>
+              <span className={styles.value}>{selectedSystem?.name || '—'}</span>
             </div>
-            <div className={styles.savingsRow}>
-              <span>Затраты на газ</span>
-              <span>{formatPrice(gasCost)}/мес</span>
+            <div className={styles.rowSub}>
+              <span>Базовая цена</span>
+              <span>{selectedSystem?.price != null ? formatPrice(selectedSystem.price) : 'По запросу'}</span>
             </div>
-            <div className={styles.savingsRow}>
-              <span>Экономия</span>
-              <span className={styles.savingsHighlight}>{formatPrice(monthlySavings)}/мес</span>
+            {selectedSystem && baseOptions && Array.isArray(baseOptions) && (
+              <div className={styles.baseOptions}>
+                <ul className={styles.baseOptionsList}>
+                  {baseOptions.map((opt, i) => (
+                    <li key={i}>{opt}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className={styles.row}>
+              <span className={styles.label}>🛢 Баллон</span>
+              <span className={styles.value}>{selectedTank?.name || '—'}</span>
             </div>
-            <div className={styles.savingsRow}>
-              <span>Окупаемость</span>
-              <span className={styles.paybackHighlight}>{formatMonths(paybackMonths)}</span>
+            {selectedTank && selectedTank.price > 0 && (
+              <div className={styles.rowSub}>
+                <span>Доплата</span>
+                <span>+{formatPrice(selectedTank.price)}</span>
+              </div>
+            )}
+
+            {(discountMontage || gibddDocs || extrasList.length > 0) && (
+              <div className={styles.row}>
+                <span className={styles.label}>📋 Дополнительно</span>
+                <span></span>
+              </div>
+            )}
+            {discountMontage && (
+              <div className={styles.rowSub}>
+                <span>Скидка «Гибкий график»</span>
+                <span className={styles.discountText}>-{formatPrice(discount)}</span>
+              </div>
+            )}
+            {gibddDocs && (
+              <div className={styles.rowSub}>
+                <span>ГИБДД (документы)</span>
+                <span>{Number(settings?.price_gibdd_docs) === 0 ? 'Включено' : `+${formatPrice(Number(settings?.price_gibdd_docs) || 0)}`}</span>
+              </div>
+            )}
+            {extrasList.map((item) => (
+              <div key={item.id} className={styles.rowSub}>
+                <span>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
+                <span>{item.price != null ? `+${formatPrice(item.price)}` : 'По запросу'}</span>
+              </div>
+            ))}
+
+            <div className={styles.totalRow}>
+              <span className={styles.totalLabel}>ИТОГО</span>
+              <span className={styles.totalValue}>
+                {totalPrice != null ? formatPrice(totalPrice) : 'По запросу'}
+              </span>
+            </div>
+
+            <div className={styles.savingsBlock}>
+              <h3 className={styles.savingsTitle}>📊 Расчёт окупаемости</h3>
+              <div style={{ color: '#000000', fontSize: '0.85rem', marginBottom: '12px', fontWeight: '500' }}>
+                Расчет при расходе {consumption} л/100 км и пробеге {mileage} км/мес
+              </div>
+              <div className={styles.savingsRow}>
+                <span>Затраты на бензин (АИ-{fuelType})</span>
+                <span>{formatPrice(petrolCost)}/мес</span>
+              </div>
+              <div className={styles.savingsRow}>
+                <span>Затраты на газ</span>
+                <span>{formatPrice(gasCost)}/мес</span>
+              </div>
+              <div className={styles.savingsRow}>
+                <span>Экономия</span>
+                <span className={styles.savingsHighlight}>{formatPrice(monthlySavings)}/мес</span>
+              </div>
+              <div className={styles.savingsRow}>
+                <span>Окупаемость</span>
+                <span className={styles.paybackHighlight}>{formatMonths(paybackMonths)}</span>
+              </div>
             </div>
           </div>
         </div>
