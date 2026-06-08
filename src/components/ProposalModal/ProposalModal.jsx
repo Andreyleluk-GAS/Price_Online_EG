@@ -207,7 +207,7 @@ export default function ProposalModal({
               </div>
             )}
 
-            <div className={styles.row}>
+            <div className={`${styles.row} ${styles.stackedRowMobile}`}>
               <span className={styles.label}>🛢 Баллон</span>
               <span className={styles.value}>{selectedTank?.name || '—'}</span>
             </div>
