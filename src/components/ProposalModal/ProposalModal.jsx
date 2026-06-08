@@ -189,7 +189,7 @@ export default function ProposalModal({
               <span className={styles.value}>{gboFuelType === 'METAN' ? 'МЕТАН' : 'ПРОПАН'}</span>
             </div>
 
-            <div className={styles.row}>
+            <div className={`${styles.row} ${styles.stackedRowMobile}`}>
               <span className={styles.label}>⚙️ Система ГБО</span>
               <span className={styles.value}>{selectedSystem?.name || '—'}</span>
             </div>

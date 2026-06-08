@@ -298,6 +298,15 @@
   .row {
     padding: 4px 0;
   }
+  .stackedRowMobile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .stackedRowMobile .value {
+    text-align: left;
+    margin-top: 4px;
+    width: 100%;
+  }
   .rowSub {
     padding: 1px 0 1px 12px;
     font-size: 0.8rem;
