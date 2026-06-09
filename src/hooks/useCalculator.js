@@ -11,8 +11,12 @@ export function useCalculator(settings, priceItems) {
   const [consumption, setConsumption] = useState(10);
   const [mileage, setMileage] = useState(2000);
   const [selectedCar, setSelectedCar] = useState(null);
-  const [targetBalloonsIds, setTargetBalloonsIds] = useState([]);
   const [selectedExtras, setSelectedExtras] = useState({}); // { [id]: item }
+
+  const targetOptionIds = useMemo(() => {
+    if (!selectedCar?.targetOptions) return [];
+    return selectedCar.targetOptions.split(/[;,]/).map(s => s.trim()).filter(Boolean);
+  }, [selectedCar]);
 
   useEffect(() => {
     if (selectedCar) {
@@ -20,38 +24,57 @@ export function useCalculator(settings, priceItems) {
         setCylinders(selectedCar.cylinders);
       }
       
-      if (selectedCar.targetOptions) {
-        const ids = selectedCar.targetOptions.split(';').map(s => s.trim()).filter(Boolean);
-        setTargetBalloonsIds(ids);
-      } else {
-        setTargetBalloonsIds([]);
+      if (priceItems?.extraOptions) {
+        const targetExtras = priceItems.extraOptions.filter(e => targetOptionIds.includes(e.id));
+        if (targetExtras.length > 0) {
+          setSelectedExtras((prev) => {
+            const next = { ...prev };
+            targetExtras.forEach(e => {
+              next[e.id] = e;
+            });
+            return next;
+          });
+        }
       }
     }
-  }, [selectedCar]);
+  }, [selectedCar, targetOptionIds, priceItems]);
 
   useEffect(() => {
-    setSelectedSystem(null);
+    let nextSystem = null;
+    let nextTank = null;
 
-    // Default tank resolution
-    let newSelectedTank = null;
-    const tanksPool = gboFuelType === 'METAN' 
-      ? (priceItems?.optionsMetanTanks || [])
-      : (priceItems?.optionsPropanTanks || []);
+    if (priceItems) {
+      if (cylinders) {
+        const fuelPrefix = gboFuelType === 'METAN' ? 'systemsMetan' : 'systemsPropan';
+        const sysCategory = `${fuelPrefix}${cylinders}`;
+        const fallbackSys = gboFuelType === 'METAN' && cylinders === 4 ? priceItems.systemsMetan : null;
+        const validSystems = priceItems[sysCategory] || fallbackSys || [];
+        
+        nextSystem = validSystems.find(s => targetOptionIds.includes(s.id)) || null;
+      }
 
-    if (targetBalloonsIds.length > 0) {
-      newSelectedTank = tanksPool.find(t => t.id === targetBalloonsIds[0]) || null;
+      const tanksPool = gboFuelType === 'METAN' 
+        ? (priceItems.optionsMetanTanks || [])
+        : (priceItems.optionsPropanTanks || []);
+
+      nextTank = tanksPool.find(t => targetOptionIds.includes(t.id)) || null;
+
+      if (!nextTank) {
+        const defaultTanks = tanksPool.filter(t => t.name && t.name.includes('[Y]'));
+        if (defaultTanks.length > 0) {
+          defaultTanks.sort((a, b) => a.id.localeCompare(b.id));
+          nextTank = defaultTanks[0];
+        }
+      }
     }
 
-    if (!newSelectedTank && gboFuelType === 'PROPAN') {
-      newSelectedTank = (priceItems?.optionsPropanTanks || []).find(t => t.id === 'PDOPBZ002') || null;
-    }
-
-    setSelectedTank(newSelectedTank);
+    setSelectedSystem(nextSystem);
+    setSelectedTank(nextTank);
 
     if (gboFuelType === 'METAN' && cylinders !== 4) {
       setCylinders(4);
     }
-  }, [gboFuelType, cylinders, priceItems, targetBalloonsIds]);
+  }, [gboFuelType, cylinders, priceItems, targetOptionIds]);
 
   useEffect(() => {
     setSelectedExtras((prevExtras) => {
@@ -71,6 +94,10 @@ export function useCalculator(settings, priceItems) {
           const systemCodePrefix = selectedSystem?.id?.substring(0, 3);
           if (!systemCodePrefix) return;
           if (!tags.some(tag => tag.includes(systemCodePrefix))) return;
+        }
+
+        if (item.optionCategory === 'Y') {
+          return;
         }
 
         nextExtras[id] = item;
@@ -145,7 +172,7 @@ export function useCalculator(settings, priceItems) {
     selectedSystem, selectedTank, cylinders, discountMontage,
     gibddDocs, fuelType, consumption, mileage,
     gboFuelType, selectedExtras, settings,
-    petrolPrice92, petrolPrice95, gasPrice, gibddPrice, targetBalloonsIds
+    petrolPrice92, petrolPrice95, gasPrice, gibddPrice, targetOptionIds
   ]);
 
   const isSelectedExtra = (item) => !!selectedExtras[item.id];
@@ -161,7 +188,7 @@ export function useCalculator(settings, priceItems) {
     consumption, setConsumption,
     mileage, setMileage,
     selectedCar, setSelectedCar,
-    targetBalloonsIds,
+    targetOptionIds,
     selectedExtras, setSelectedExtras,
     ...calculations,
     toggleExtra,

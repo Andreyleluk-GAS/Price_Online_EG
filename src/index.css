@@ -60,7 +60,13 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, h5, h6, .section-title {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.section-title {
   font-family: 'Montserrat', sans-serif;
 }
 
@@ -258,6 +264,7 @@ select option {
     opacity: 0;
     transform: translateY(8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -269,6 +276,7 @@ select option {
     opacity: 0;
     transform: translateY(100%);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -280,6 +288,7 @@ select option {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -287,9 +296,12 @@ select option {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }

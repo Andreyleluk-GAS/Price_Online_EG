@@ -41,7 +41,9 @@ export default function OptionsModal({
 
   const extraOptions = useMemo(() => {
     if (!priceItems) return [];
-    return (priceItems.extraOptions || []).map(item => {
+    return (priceItems.extraOptions || [])
+      .filter(item => item.optionCategory !== 'Y')
+      .map(item => {
       // Защита для ГИБДД если она вдруг попадет в массив
       if (item.name && item.name.includes('ГИБДД')) {
         return { ...item, price: Number(settings?.price_gibdd_docs) || 0 };
@@ -206,9 +208,6 @@ export default function OptionsModal({
                   <div className={styles.checkLabelExtra}>
                     <div className={styles.extraTextBlock}>
                       <span className={styles.optionName}>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
-                      {item.codeDetails && (
-                        <span className={styles.extraMeta}>{item.codeDetails}</span>
-                      )}
                     </div>
                     <span className={`${styles.extraPrice} ${(Array.isArray(localExtras) && localExtras.some(x => x.id === item.id)) ? styles.extraPriceActive : ''}`}>
                       {item.price != null ? formatPrice(item.price) : 'По запросу'}

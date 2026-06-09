@@ -3,7 +3,7 @@ import { formatNumber } from '../../utils/formatters';
 import TankModal from '../TankModal/TankModal';
 import styles from './TankSelect.module.css';
 
-export default function TankSelect({ gboFuelType, selectedTank, onSelect, priceItems, targetBalloonsIds = [] }) {
+export default function TankSelect({ gboFuelType, selectedTank, onSelect, priceItems, targetOptionIds = [] }) {
   const [showModal, setShowModal] = useState(false);
 
   // Derive tanks from priceItems by fuel type
@@ -37,7 +37,7 @@ export default function TankSelect({ gboFuelType, selectedTank, onSelect, priceI
           <div className={styles.selectedInfo}>
             <div className={styles.rowContainer}>
               <span className={styles.selectedName}>
-                {selectedTank.name}
+                {(selectedTank.name || '').replace(/\[.*?\]/g, '').trim()}
               </span>
               <span className={styles.selectedPrice}>
                 {selectedTank.price == null ? (
@@ -66,7 +66,7 @@ export default function TankSelect({ gboFuelType, selectedTank, onSelect, priceI
         tanks={tanks}
         selectedTank={selectedTank}
         onApply={handleApply}
-        targetBalloonsIds={targetBalloonsIds}
+        targetOptionIds={targetOptionIds}
         isMetan={gboFuelType === 'METAN'}
       />
     </section>

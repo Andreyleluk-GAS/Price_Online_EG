@@ -11,7 +11,7 @@ export default function ProposalModal({
   discountMontage, discount, gibddDocs, gibddPrice,
   totalPrice, petrolCost, gasCost, monthlySavings, paybackMonths,
   fuelType, selectedExtras, settings,
-  consumption, mileage,
+  consumption, mileage, priceItems,
 }) {
   const extrasList = selectedExtras ? Object.values(selectedExtras) : [];
   const [toastMessage, setToastMessage] = useState(null);
@@ -26,28 +26,25 @@ export default function ProposalModal({
   }, [toastMessage]);
 
   const baseOptions = useMemo(() => {
-    const baseOptionsPropane = ["Мультиклапан европа", "Магистраль сталь", "Заправочное устройство", "Размещение баллона - внутри"];
-    const baseOptionsMethane = ["Заправочное устройство", "Манометр механический", "Баллонный вентиль", "Электромагнитный клапан"];
+    if (!priceItems || !priceItems.extraOptions) return [];
 
-    if (gboFuelType === 'METAN') {
-      const hasElectronicManometer = (extrasList || []).some(
-        (item) => item?.id && typeof item.id === 'string' && item.id.startsWith('MDOP') && item.id.endsWith('001')
-      );
-      if (hasElectronicManometer) {
-        return baseOptionsMethane.filter(opt => opt !== "Манометр механический");
-      }
-      return baseOptionsMethane;
-    }
-
-    const hasBottomTank = (extrasList || []).some(
-      (item) => (item?.name || '').includes('Установка баллона снизу') || (item?.id && typeof item.id === 'string' && item.id.includes('PDOP') && item.id.includes('001'))
+    const baseItems = priceItems.extraOptions.filter(item => 
+      item.optionCategory === 'Y' && 
+      (item.fuelScope === 'BOTH' || item.fuelScope === gboFuelType)
     );
-    if (hasBottomTank) {
-      return baseOptionsPropane.filter(opt => opt !== "Размещение баллона - внутри");
-    }
+    
+    const selectedExtraIds = extrasList.map(item => item.id);
 
-    return baseOptionsPropane;
-  }, [gboFuelType, extrasList]);
+    const validBaseItems = baseItems.filter(baseItem => {
+      const tags = baseItem.name ? (baseItem.name.match(/\[(.*?)\]/g) || []) : [];
+      const cleanTags = tags.map(tag => tag.replace(/\[|\]/g, '').trim());
+      
+      const isReplaced = cleanTags.some(tag => selectedExtraIds.includes(tag));
+      return !isReplaced;
+    });
+
+    return validBaseItems.map(item => (item.name || '').replace(/\[.*?\]/g, '').trim());
+  }, [gboFuelType, extrasList, priceItems]);
 
   useEffect(() => {
     if (show) {
@@ -209,7 +206,7 @@ export default function ProposalModal({
 
             <div className={`${styles.row} ${styles.stackedRowMobile}`}>
               <span className={styles.label}>🛢 Баллон</span>
-              <span className={styles.value}>{selectedTank?.name || '—'}</span>
+              <span className={styles.value}>{selectedTank ? (selectedTank.name || '').replace(/\[.*?\]/g, '').trim() : '—'}</span>
             </div>
             {selectedTank && selectedTank.price > 0 && (
               <div className={styles.rowSub}>
@@ -224,24 +221,28 @@ export default function ProposalModal({
                 <span></span>
               </div>
             )}
-            {discountMontage && (
-              <div className={styles.rowSub}>
-                <span>Скидка «Гибкий график»</span>
-                <span className={styles.discountText}>-{formatPrice(discount)}</span>
-              </div>
+            {(discountMontage || gibddDocs || extrasList.length > 0) && (
+              <ul className={styles.extraOptionsList}>
+                {discountMontage && (
+                  <li>
+                    <span>Скидка «Гибкий график»</span>
+                    <span className={styles.discountText}>-{formatPrice(discount)}</span>
+                  </li>
+                )}
+                {gibddDocs && (
+                  <li>
+                    <span>ГИБДД (документы)</span>
+                    <span>{Number(settings?.price_gibdd_docs) === 0 ? 'Включено' : `+${formatPrice(Number(settings?.price_gibdd_docs) || 0)}`}</span>
+                  </li>
+                )}
+                {extrasList.map((item) => (
+                  <li key={item.id}>
+                    <span>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
+                    <span>{item.price != null ? `+${formatPrice(item.price)}` : 'По запросу'}</span>
+                  </li>
+                ))}
+              </ul>
             )}
-            {gibddDocs && (
-              <div className={styles.rowSub}>
-                <span>ГИБДД (документы)</span>
-                <span>{Number(settings?.price_gibdd_docs) === 0 ? 'Включено' : `+${formatPrice(Number(settings?.price_gibdd_docs) || 0)}`}</span>
-              </div>
-            )}
-            {extrasList.map((item) => (
-              <div key={item.id} className={styles.rowSub}>
-                <span>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
-                <span>{item.price != null ? `+${formatPrice(item.price)}` : 'По запросу'}</span>
-              </div>
-            ))}
 
             <div className={styles.totalRow}>
               <span className={styles.totalLabel}>ИТОГО</span>

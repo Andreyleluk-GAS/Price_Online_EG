@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { formatNumber } from '../../utils/formatters';
 import styles from './TankModal.module.css';
 
-export default function TankModal({ show, onClose, tanks, selectedTank, onApply, targetBalloonsIds = [], isMetan }) {
+export default function TankModal({ show, onClose, tanks, selectedTank, onApply, targetOptionIds = [], isMetan }) {
   const [localSelected, setLocalSelected] = useState(selectedTank?.id || null);
 
   // Sync local selection when modal opens
@@ -34,13 +34,13 @@ export default function TankModal({ show, onClose, tanks, selectedTank, onApply,
 
   const sortedTanks = useMemo(() => {
     return [...tanks].sort((a, b) => {
-      const aTarget = targetBalloonsIds.includes(a.id);
-      const bTarget = targetBalloonsIds.includes(b.id);
+      const aTarget = targetOptionIds.includes(a.id);
+      const bTarget = targetOptionIds.includes(b.id);
       if (aTarget && !bTarget) return -1;
       if (!aTarget && bTarget) return 1;
       return 0;
     });
-  }, [tanks, targetBalloonsIds]);
+  }, [tanks, targetOptionIds]);
 
   if (!show) return null;
 
@@ -72,7 +72,7 @@ export default function TankModal({ show, onClose, tanks, selectedTank, onApply,
         <div className={styles.content}>
           <div className={styles.gridContainer}>
             {sortedTanks.map((tank) => {
-              const isTarget = targetBalloonsIds.includes(tank.id);
+              const isTarget = targetOptionIds.includes(tank.id);
 
               return (
                 <label key={tank.id} className={styles.tankCard}>
@@ -87,7 +87,7 @@ export default function TankModal({ show, onClose, tanks, selectedTank, onApply,
                   <div className={`${styles.card} ${localSelected === tank.id ? styles.cardSelected : ''}`}>
                     <div className={styles.cardContent}>
                       <h3 className={styles.tankName}>
-                        {tank.name}
+                        {(tank.name || '').replace(/\[.*?\]/g, '').trim()}
                         {isTarget && (
                           <span className={styles.verifiedBadge}>
                             ✅ Проверено

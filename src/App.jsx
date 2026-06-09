@@ -80,11 +80,16 @@ export default function App() {
 
               <SystemSelect
                 gboFuelType={calc.gboFuelType}
-                isMetan={calc.gboFuelType === 'METAN'}
                 cylinders={calc.cylinders}
                 selectedCar={calc.selectedCar}
+                isMetan={calc.gboFuelType === 'METAN'}
                 selectedSystem={calc.selectedSystem}
-                onSelect={calc.setSelectedSystem}
+                onSelect={(sys) => {
+                  calc.setSelectedSystem(sys);
+                  if (sys && sys.cylinders) {
+                    calc.setCylinders(Number(sys.cylinders));
+                  }
+                }}
                 priceItems={priceItems}
               />
 
@@ -94,7 +99,7 @@ export default function App() {
                 selectedTank={calc.selectedTank}
                 onSelect={calc.setSelectedTank}
                 priceItems={priceItems}
-                targetBalloonsIds={calc.targetBalloonsIds}
+                targetOptionIds={calc.targetOptionIds}
               />
 
               <Options
@@ -164,6 +169,7 @@ export default function App() {
         selectedExtras={calc.selectedExtras}
         consumption={calc.consumption}
         mileage={calc.mileage}
+        priceItems={priceItems}
       />
     </div>
   );

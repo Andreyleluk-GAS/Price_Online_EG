@@ -109,13 +109,44 @@
   list-style: none;
   font-size: 0.8rem;
   color: var(--text-muted);
-  line-height: 1.25;
+  line-height: 1.35;
 }
 
 .baseOptionsList li {
-  margin-bottom: 0;
+  margin-bottom: 2px;
   position: relative;
   padding-left: 10px;
+}
+
+.baseOptionsList li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--border);
+}
+
+.extraOptionsList {
+  margin: 0;
+  padding: 0 0 6px 20px;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+.extraOptionsList li {
+  margin-bottom: 2px;
+  position: relative;
+  padding-left: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.extraOptionsList li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: var(--border);
 }
 
 .baseOptionsList li::before {
