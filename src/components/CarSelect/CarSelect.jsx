@@ -101,7 +101,7 @@ export default function CarSelect({
 
   const cylinderOptions = useMemo(() => {
     if (!priceItems) {
-      return gboFuelType === 'METAN' ? [4] : [4, 6, 8];
+      return [4, 6, 8];
     }
 
     const prefix = gboFuelType === 'METAN' ? 'systemsMetan' : 'systemsPropan';
@@ -118,7 +118,7 @@ export default function CarSelect({
       return Array.from(new Set(values)).sort((a, b) => a - b);
     }
 
-    return gboFuelType === 'METAN' ? [4] : [4, 6, 8];
+    return [4, 6, 8];
   }, [gboFuelType, priceItems]);
 
   const handleTabClick = (n) => {

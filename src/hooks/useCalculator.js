@@ -71,9 +71,6 @@ export function useCalculator(settings, priceItems) {
     setSelectedSystem(nextSystem);
     setSelectedTank(nextTank);
 
-    if (gboFuelType === 'METAN' && cylinders !== 4) {
-      setCylinders(4);
-    }
   }, [gboFuelType, cylinders, priceItems, targetOptionIds]);
 
   useEffect(() => {
