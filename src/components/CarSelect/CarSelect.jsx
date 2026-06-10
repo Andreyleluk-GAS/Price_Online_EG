@@ -45,11 +45,20 @@ export default function CarSelect({
   }, []);
 
   const makes = useMemo(() => {
-    const uniqueMakes = new Set();
+    const makeMap = new Map();
     carList.forEach(car => {
-      if (car.brand) uniqueMakes.add(car.brand);
+      if (car.brand) {
+        if (!makeMap.has(car.brand)) {
+          makeMap.set(car.brand, !!car.experience);
+        } else if (car.experience) {
+          makeMap.set(car.brand, true);
+        }
+      }
     });
-    return Array.from(uniqueMakes).sort();
+    return Array.from(makeMap.keys()).sort().map(brand => ({
+      brand,
+      experience: makeMap.get(brand)
+    }));
   }, [carList]);
 
   const models = useMemo(() => {
@@ -156,9 +165,9 @@ export default function CarSelect({
             disabled={loading}
           >
             <option value="">Выберите марку</option>
-            {makes.map((make) => (
-              <option key={make} value={make}>
-                {make}
+            {makes.map((m) => (
+              <option key={m.brand} value={m.brand}>
+                {m.brand}{m.experience ? ' ⭐' : ''}
               </option>
             ))}
           </select>
@@ -175,7 +184,7 @@ export default function CarSelect({
             <option value="">Выберите модель</option>
             {models.map((car) => (
               <option key={car.id} value={car.model}>
-                {car.model}
+                {car.model}{car.experience ? ' ⭐' : ''}
               </option>
             ))}
           </select>
