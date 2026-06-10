@@ -250,47 +250,89 @@
 
 .copyBtn {
   flex: 1;
-  padding: 0;
-  min-height: 44px;
+  padding: 0 8px;
+  min-height: 46px;
   background: var(--text-primary);
   color: #ffffff;
   font-weight: 600;
   font-size: 0.9rem;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .copyBtn:hover {
   background: var(--text-secondary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.copyBtn:active {
+  transform: scale(0.95);
 }
 
 .closeBtnSecondary {
   flex: 1;
-  padding: 0;
-  min-height: 44px;
+  padding: 0 8px;
+  min-height: 46px;
   background: var(--bg-card-hover);
   color: var(--text-primary);
   font-weight: 600;
   font-size: 0.9rem;
-  border: none;
-  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
   cursor: pointer;
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  transition: all 0.15s;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .closeBtnSecondary:hover {
-  background: var(--border);
+  background: #ffffff;
+  border-color: var(--text-muted);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.closeBtnSecondary:active {
+  transform: scale(0.95);
+}
+
+.bookBtn {
+  flex: 1;
+  padding: 0 8px;
+  min-height: 46px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 4px 12px var(--accent-glow);
+}
+
+.bookBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px var(--accent-shadow);
+  filter: brightness(1.05);
+}
+
+.bookBtn:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px var(--accent-shadow);
 }
 
 @keyframes fadeIn {
@@ -393,8 +435,16 @@
   .actions {
     padding: 8px 16px 16px;
     gap: 8px;
+    flex-wrap: wrap;
+  }
+  .bookBtn {
+    flex: 0 0 100%;
+    order: -1;
   }
   .copyBtn, .closeBtnSecondary {
+    flex: 1;
+  }
+  .copyBtn, .bookBtn, .closeBtnSecondary {
     min-height: 40px;
     font-size: 0.85rem;
   }

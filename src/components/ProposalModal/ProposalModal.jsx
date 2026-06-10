@@ -286,6 +286,14 @@ export default function ProposalModal({
             </svg>
             Скопировать
           </button>
+          <a
+            href="https://n2274096.yclients.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.bookBtn}
+          >
+            Запись on-line
+          </a>
           <button className={styles.closeBtnSecondary} onClick={onClose}>
             Закрыть
           </button>
