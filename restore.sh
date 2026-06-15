@@ -14,11 +14,13 @@ apt install -y nodejs
 echo "3. Установка PM2 для бэкенда..."
 npm install -g pm2
 
-echo "4. Создание структуры папок..."
+echo "4. Создание структуры папок и настройка ключей доступа..."
 mkdir -p /root/frontend /root/backend
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
-touch /root/.ssh/authorized_keys
+
+# Запись публичного SSH-ключа для GitHub Actions
+echo "ВСТАВЬ_СЮДА_СВОЙ_ПУБЛИЧНЫЙ_КЛЮЧ_ЦЕЛИКОМ" > /root/.ssh/authorized_keys
 chmod 600 /root/.ssh/authorized_keys
 
 echo "5. Настройка Nginx и SSL..."
@@ -33,6 +35,7 @@ server {
     listen 443 ssl;
     server_name elitegas.stockcity.ru;
 
+    # Пути к сертификатам 3X-UI панели
     ssl_certificate /root/cert/elitegas.stockcity.ru/fullchain.pem;
     ssl_certificate_key /root/cert/elitegas.stockcity.ru/privkey.pem;
 
@@ -54,14 +57,14 @@ server {
 }
 EOF
 
+# Удаляем дефолтную заглушку Nginx
 rm -f /etc/nginx/sites-enabled/default
+
+echo "6. Перезапуск веб-сервера..."
 systemctl restart nginx
 systemctl enable nginx
 
 echo "========================================"
-echo "✅ СЕРВЕР УСПЕШНО ПОДГОТОВЛЕН!"
-echo "========================================"
-echo "⚠️ ВАЖНО: Чтобы автоматическая загрузка с GitHub (CI/CD) снова заработала,"
-echo "тебе нужно добавить публичный SSH-ключ от GitHub в файл:"
-echo "nano /root/.ssh/authorized_keys"
+echo "✅ СЕРВЕР УСПЕШНО ПОДГОТОВЛЕН И НАСТРОЕН!"
+echo "Теперь можешь запустить deploy.bat на своем ПК."
 echo "========================================"
