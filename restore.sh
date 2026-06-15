@@ -19,8 +19,8 @@ mkdir -p /root/frontend /root/backend
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
 
-# Запись публичного SSH-ключа для GitHub Actions
-echo "ВСТАВЬ_СЮДА_СВОЙ_ПУБЛИЧНЫЙ_КЛЮЧ_ЦЕЛИКОМ" > /root/.ssh/authorized_keys
+# Запись твоего публичного SSH-ключа для GitHub Actions
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII8QaZEfGMci3g0NuVM08mUHruZfsoBmT9GPJ5iacxpv github-actions" > /root/.ssh/authorized_keys
 chmod 600 /root/.ssh/authorized_keys
 
 echo "5. Настройка Nginx и SSL..."
@@ -66,5 +66,5 @@ systemctl enable nginx
 
 echo "========================================"
 echo "✅ СЕРВЕР УСПЕШНО ПОДГОТОВЛЕН И НАСТРОЕН!"
-echo "Теперь можешь запустить deploy.bat на своем ПК."
+echo "Теперь робот GitHub имеет полный доступ к серверу."
 echo "========================================"
