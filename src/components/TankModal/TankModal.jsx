@@ -100,7 +100,9 @@ export default function TankModal({ show, onClose, tanks, selectedTank, onApply,
                         ) : tank.price === 0 ? (
                           <span className={styles.priceZero}>Без доплаты</span>
                         ) : (
-                          <span className={styles.priceValue}>+{formatNumber(tank.price)} ₽</span>
+                          <span className={tank.price < 0 ? styles.priceNegative : styles.priceValue}>
+                            {tank.price > 0 ? '+' : ''}{formatNumber(tank.price)} ₽
+                          </span>
                         )}
                       </div>
                     </div>

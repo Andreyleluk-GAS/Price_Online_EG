@@ -11,7 +11,16 @@ export default function SystemSelect({ gboFuelType, cylinders, selectedCar, isMe
     
     const categoryKey = `${fuelPrefix}${cylinders}`;
     const fallback = gboFuelType === 'METAN' && cylinders === 4 ? priceItems.systemsMetan || [] : [];
-    return priceItems[categoryKey] || fallback;
+    const items = priceItems[categoryKey] || fallback;
+
+    return [...items].sort((a, b) => {
+      const getPriceValue = (sys) => {
+        if (sys.price === 'по запросу' || sys.price == null) return Infinity;
+        const num = Number(sys.price);
+        return isNaN(num) ? Infinity : num;
+      };
+      return getPriceValue(a) - getPriceValue(b);
+    });
   }, [priceItems, cylinders, gboFuelType]);
 
   if (!cylinders) {

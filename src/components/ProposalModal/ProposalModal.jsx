@@ -208,10 +208,29 @@ export default function ProposalModal({
               <span className={styles.label}>🛢 Баллон</span>
               <span className={styles.value}>{selectedTank ? (selectedTank.name || '').replace(/\[.*?\]/g, '').trim() : '—'}</span>
             </div>
-            {selectedTank && selectedTank.price > 0 && (
+            {selectedTank && (
               <div className={styles.rowSub}>
-                <span>Доплата</span>
-                <span>+{formatPrice(selectedTank.price)}</span>
+                {selectedTank.price == null || selectedTank.price === 'по запросу' ? (
+                  <>
+                    <span>Включено в стоимость</span>
+                    <span>-</span>
+                  </>
+                ) : selectedTank.price === 0 ? (
+                  <>
+                    <span>Включено в стоимость</span>
+                    <span>-</span>
+                  </>
+                ) : selectedTank.price > 0 ? (
+                  <>
+                    <span>Доплата за опцию</span>
+                    <span>+{formatPrice(selectedTank.price)}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Скидка за опцию</span>
+                    <span className={styles.priceNegative}>{formatPrice(selectedTank.price)}</span>
+                  </>
+                )}
               </div>
             )}
 
@@ -238,7 +257,9 @@ export default function ProposalModal({
                 {extrasList.map((item) => (
                   <li key={item.id}>
                     <span>{(item.name || '').replace(/\[.*?\]/g, '').trim()}</span>
-                    <span>{item.price != null ? `+${formatPrice(item.price)}` : 'По запросу'}</span>
+                    <span className={item.price < 0 ? styles.priceNegative : ''}>
+                      {item.price != null ? (item.price > 0 ? '+' : '') + formatPrice(item.price) : 'По запросу'}
+                    </span>
                   </li>
                 ))}
               </ul>

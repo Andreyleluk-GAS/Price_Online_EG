@@ -161,6 +161,11 @@
   font-weight: 600;
 }
 
+.priceNegative {
+  color: var(--error);
+  font-weight: 600;
+}
+
 .totalRow {
   display: flex;
   justify-content: space-between;

@@ -43,7 +43,7 @@ export default function Options({
   for (const item of selectedExtrasList) {
     summaryItems.push({
       label: (item.name || '').replace(/\[.*?\]/g, '').trim(),
-      value: item.price != null ? `+${formatPrice(item.price)}` : 'По запросу',
+      value: item.price != null ? (item.price > 0 ? '+' : '') + formatPrice(item.price) : 'По запросу',
       type: 'extra'
     });
   }

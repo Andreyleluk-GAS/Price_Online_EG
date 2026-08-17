@@ -30,10 +30,11 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 12px 16px; /* Compact padding */
-  background: var(--bg-card);
-  border: 2px solid var(--accent);
-  border-radius: var(--radius-sm);
+  padding: 20px; /* Matched with SystemSelect */
+  background: var(--accent-glow); /* Matched with SystemSelect active */
+  border: 1px solid var(--accent); /* Matched with SystemSelect active */
+  border-radius: var(--radius); /* Matched with SystemSelect */
+  box-shadow: 0 0 24px var(--accent-glow); /* Matched with SystemSelect active */
   animation: slideDown 0.2s ease;
 }
 
@@ -65,28 +66,27 @@
 
 .rowContainer {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-}
-
-@media (min-width: 640px) {
-  .rowContainer {
-    align-items: center;
-  }
+  gap: 12px;
 }
 
 .selectedName {
+  font-size: 0.95rem; /* Matched with SystemSelect */
   font-weight: 600;
   color: var(--text-primary);
   word-wrap: break-word;
 }
 
 .selectedPrice {
-  font-size: 0.9rem;
+  font-size: 1.2rem; /* Matched with SystemSelect */
+  font-weight: 700;
   color: var(--accent);
-  font-weight: 500;
-  white-space: nowrap;
+  text-align: left;
+}
+
+.priceNegative {
+  color: var(--error) !important;
 }
 
 .changeButton {
@@ -136,33 +136,5 @@
 @media (min-width: 640px) {
   .buttonWrap {
     align-self: center;
-  }
-}
-
-@media (max-width: 576px) {
-  .selectedContainer {
-    padding: 10px 12px;
-    gap: 12px;
-  }
-  .rowContainer {
-    gap: 6px;
-  }
-  .selectedName {
-    font-size: 0.9rem;
-  }
-  .selectedPrice {
-    font-size: 0.85rem;
-  }
-}
-
-@media (max-width: 400px) {
-  .rowContainer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 4px;
-  }
-  
-  .selectedPrice {
-    align-self: flex-end;
   }
 }

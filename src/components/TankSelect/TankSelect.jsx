@@ -39,13 +39,13 @@ export default function TankSelect({ gboFuelType, selectedTank, onSelect, priceI
               <span className={styles.selectedName}>
                 {(selectedTank.name || '').replace(/\[.*?\]/g, '').trim()}
               </span>
-              <span className={styles.selectedPrice}>
+              <span className={`${styles.selectedPrice} ${selectedTank.price < 0 ? styles.priceNegative : ''}`}>
                 {selectedTank.price == null ? (
                   'По запросу'
                 ) : selectedTank.price === 0 ? (
                   'Без доплаты'
                 ) : (
-                  `+${formatNumber(selectedTank.price)} ₽`
+                  `${selectedTank.price > 0 ? '+' : ''}${formatNumber(selectedTank.price)} ₽`
                 )}
               </span>
             </div>
