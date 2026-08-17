@@ -35,7 +35,15 @@ export default function App() {
   const loadPriceItems = useCallback(async () => {
     try {
       const data = await getPriceItems();
-      setPriceItems(data);
+      const filteredData = {};
+      Object.keys(data).forEach(key => {
+        if (Array.isArray(data[key])) {
+          filteredData[key] = data[key].filter(item => item.price !== '!');
+        } else {
+          filteredData[key] = data[key];
+        }
+      });
+      setPriceItems(filteredData);
     } catch (err) {
       console.error('Failed to load price items:', err);
     }

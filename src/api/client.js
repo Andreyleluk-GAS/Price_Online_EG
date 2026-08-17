@@ -41,6 +41,13 @@ export function getPriceItems() {
   return request('/price-items');
 }
 
+export function updatePriceItems(data) {
+  return request('/price-items', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 export function updateSettings(data) {
   return request('/settings/fuel', {
     method: 'PUT',

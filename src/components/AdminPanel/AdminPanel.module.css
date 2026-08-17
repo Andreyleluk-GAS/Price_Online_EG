@@ -96,6 +96,16 @@
   .priceForm {
     grid-template-columns: 1fr;
   }
+  
+  .desktopOnly {
+    display: none !important;
+  }
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .priceField {

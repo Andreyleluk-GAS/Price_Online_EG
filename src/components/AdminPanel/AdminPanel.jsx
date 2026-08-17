@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { importPrices, importCars, updateSettings, getSettings } from '../../api/client';
+import ManualPriceModal from '../ManualPriceModal/ManualPriceModal';
 import styles from './AdminPanel.module.css';
 
 export default function AdminPanel({ onSettingsUpdated }) {
@@ -19,6 +20,7 @@ export default function AdminPanel({ onSettingsUpdated }) {
   const [dragOver, setDragOver] = useState(false);
   const [dragOverCars, setDragOverCars] = useState(false);
   const [carsLastUpdated, setCarsLastUpdated] = useState(null);
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const fileRef = useRef(null);
   const fileCarsRef = useRef(null);
 
@@ -120,10 +122,19 @@ export default function AdminPanel({ onSettingsUpdated }) {
 
       {/* File Upload */}
       <div className={styles.block}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <h3 className={styles.blockTitle}>Импорт прайс-листа</h3>
-          <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-            {priceFileUpdatedAt ? `Прайс обновлен: ${new Date(priceFileUpdatedAt).toLocaleString('ru-RU')}` : 'Прайс еще не загружен'}
+          <div className={styles.headerInfo}>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {priceFileUpdatedAt ? `Прайс обновлен: ${new Date(priceFileUpdatedAt).toLocaleString('ru-RU')}` : 'Прайс еще не загружен'}
+            </div>
+            <button 
+              className={`btn-secondary ${styles.desktopOnly}`}
+              style={{ padding: '6px 12px', fontSize: '0.85rem' }}
+              onClick={() => setIsManualModalOpen(true)}
+            >
+              Корректировка цен вручную
+            </button>
           </div>
         </div>
         <div
@@ -274,6 +285,17 @@ export default function AdminPanel({ onSettingsUpdated }) {
           </div>
         )}
       </div>
+
+      <ManualPriceModal 
+        isOpen={isManualModalOpen} 
+        onClose={(saved) => {
+          setIsManualModalOpen(false);
+          if (saved) {
+            setUploadResult({ success: true, message: 'Цены обновлены вручную!' });
+            if (onSettingsUpdated) onSettingsUpdated();
+          }
+        }} 
+      />
     </div>
   );
 }
