@@ -10,6 +10,7 @@ import SavingsCalc from './components/SavingsCalc/SavingsCalc';
 import StickyFooter from './components/StickyFooter/StickyFooter';
 import ProposalModal from './components/ProposalModal/ProposalModal';
 import AdminPanel from './components/AdminPanel/AdminPanel';
+import GeneralPriceView from './components/GeneralPriceView/GeneralPriceView';
 import './App.css';
 
 export default function App() {
@@ -74,6 +75,11 @@ export default function App() {
             <AdminPanel
               settings={settings}
               onSettingsUpdated={handleDataUpdated}
+            />
+          ) : settings?.isGeneralPriceEnabled ? (
+            <GeneralPriceView 
+              data={settings.generalPriceData} 
+              settings={settings}
             />
           ) : (
             <div className="calculator">
@@ -152,7 +158,7 @@ export default function App() {
         gboFuelType={calc.gboFuelType}
         totalPrice={calc.totalPrice}
         onGenerateProposal={() => setShowProposal(true)}
-        visible={!showAdmin && !!calc.selectedSystem}
+        visible={!showAdmin && !settings?.isGeneralPriceEnabled && !!calc.selectedSystem}
       />
 
       <ProposalModal
