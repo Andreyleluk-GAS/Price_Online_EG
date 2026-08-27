@@ -12,6 +12,7 @@ export default function AdminPanel({ onSettingsUpdated }) {
   const [updatedAt, setUpdatedAt] = useState(null);
   const [priceFileUpdatedAt, setPriceFileUpdatedAt] = useState(null);
   const [isGeneralPriceEnabled, setIsGeneralPriceEnabled] = useState(false);
+  const [savedIsGeneralPriceEnabled, setSavedIsGeneralPriceEnabled] = useState(false);
   const [generalPriceData, setGeneralPriceData] = useState([]);
   const [generalPriceNotes, setGeneralPriceNotes] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -26,6 +27,20 @@ export default function AdminPanel({ onSettingsUpdated }) {
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const fileRef = useRef(null);
   const fileCarsRef = useRef(null);
+  
+  const dragItem = useRef(null);
+  const dragOverItem = useRef(null);
+
+  const handleSort = () => {
+    if (dragItem.current !== null && dragOverItem.current !== null && dragItem.current !== dragOverItem.current) {
+      let _generalPriceData = [...generalPriceData];
+      const draggedItemContent = _generalPriceData.splice(dragItem.current, 1)[0];
+      _generalPriceData.splice(dragOverItem.current, 0, draggedItemContent);
+      setGeneralPriceData(_generalPriceData);
+    }
+    dragItem.current = null;
+    dragOverItem.current = null;
+  };
 
   useEffect(() => {
     async function loadFuelPrices() {
@@ -40,6 +55,7 @@ export default function AdminPanel({ onSettingsUpdated }) {
           setUpdatedAt(data.fuel_prices_updated_at);
           setPriceFileUpdatedAt(data.price_file_updated_at);
           setIsGeneralPriceEnabled(data.isGeneralPriceEnabled || false);
+          setSavedIsGeneralPriceEnabled(data.isGeneralPriceEnabled || false);
           
           if (data.generalPriceNotes && Array.isArray(data.generalPriceNotes)) {
             setGeneralPriceNotes(data.generalPriceNotes);
@@ -140,6 +156,7 @@ export default function AdminPanel({ onSettingsUpdated }) {
         generalPriceNotes
       });
       setUpdatedAt(res.fuel_prices_updated_at);
+      setSavedIsGeneralPriceEnabled(isGeneralPriceEnabled);
       setSaveResult({ success: true, message: 'Цены обновлены' });
       if (onSettingsUpdated) onSettingsUpdated();
     } catch (err) {
@@ -149,8 +166,19 @@ export default function AdminPanel({ onSettingsUpdated }) {
     }
   }
 
+  const sortedGeneralPriceNotes = [...generalPriceNotes].sort((a, b) => {
+    if (a.position === b.position) return 0;
+    return a.position === 'above' ? -1 : 1;
+  });
+
+  const updateNote = (id, field, value) => {
+    setGeneralPriceNotes(generalPriceNotes.map(note => 
+      note.id === id ? { ...note, [field]: value } : note
+    ));
+  };
+
   return (
-    <div className={styles.panel}>
+    <div className={styles.adminPanel}>
       <h2 className={styles.panelTitle}>Панель администратора</h2>
 
       {/* File Upload */}
@@ -323,7 +351,7 @@ export default function AdminPanel({ onSettingsUpdated }) {
       <div className={styles.block}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' }}>
           <h3 className={styles.blockTitle}>Общий прайс (Без детализации)</h3>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }}>
               <div className={styles.toggleSwitch}>
                 <input 
@@ -335,26 +363,63 @@ export default function AdminPanel({ onSettingsUpdated }) {
               </div>
               Включить общий прайс
             </label>
+            {isGeneralPriceEnabled !== savedIsGeneralPriceEnabled && (
+              <button 
+                onClick={handleSavePrices} 
+                className={styles.publishBtn}
+                disabled={saving}
+              >
+                {saving ? '...' : (isGeneralPriceEnabled ? 'Подтвердить включение' : 'Подтвердить отключение')}
+              </button>
+            )}
           </div>
         </div>
 
-        {isGeneralPriceEnabled && (
-          <div style={{ overflowX: 'auto', marginBottom: '15px' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
+        {savedIsGeneralPriceEnabled && (
+          <div className={styles.activePriceBanner}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            В данный момент на сайте опубликован Общий прайс (калькулятор цен скрыт)
+          </div>
+        )}
+
+        <div style={{ overflowX: 'auto', marginBottom: '15px' }}>
+          <table className={styles.priceTable}>
               <thead>
-                <tr style={{ backgroundColor: '#f0f0f0', borderBottom: '2px solid #ddd' }}>
-                  <th style={{ padding: '8px', border: '1px solid #ddd' }}>Тип ТС</th>
-                  <th style={{ padding: '8px', border: '1px solid #ddd' }}>Тип Баллон</th>
-                  <th style={{ padding: '8px', border: '1px solid #ddd' }}>Состав</th>
-                  <th style={{ padding: '8px', border: '1px solid #ddd' }}>Ст-ть комплект</th>
-                  <th style={{ padding: '8px', border: '1px solid #ddd' }}>Ст-ть установка</th>
-                  <th style={{ padding: '8px', border: '1px solid #ddd' }}>Действия</th>
+                <tr>
+                  <th className={styles.colDrag}></th>
+                  <th className={styles.colType}>Тип ТС</th>
+                  <th className={styles.colTank}>Тип Баллона</th>
+                  <th className={styles.colComposition}>Состав</th>
+                  <th className={styles.priceCol}>Стоимость комплект</th>
+                  <th className={styles.priceCol}>Стоимость установка</th>
+                  <th className={styles.colAction} title="Действия">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', margin: '0 auto' }}>
+                      <path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                    </svg>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {generalPriceData.map((row, idx) => (
-                  <tr key={idx}>
-                    <td style={{ padding: '4px', border: '1px solid #ddd' }}>
+                  <tr 
+                    key={idx}
+                    draggable
+                    onDragStart={(e) => dragItem.current = idx}
+                    onDragEnter={(e) => dragOverItem.current = idx}
+                    onDragEnd={handleSort}
+                    onDragOver={(e) => e.preventDefault()}
+                  >
+                    <td className={styles.colDrag}>
+                      <div title="Потяните для сортировки">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                      </div>
+                    </td>
+                    <td className={styles.colType}>
                       <input 
                         type="text" 
                         value={row.vehicle_type} 
@@ -363,10 +428,10 @@ export default function AdminPanel({ onSettingsUpdated }) {
                           newData[idx].vehicle_type = e.target.value;
                           setGeneralPriceData(newData);
                         }}
-                        style={{ width: '100%', padding: '4px' }}
+                        className={styles.priceInput}
                       />
                     </td>
-                    <td style={{ padding: '4px', border: '1px solid #ddd' }}>
+                    <td className={styles.colTank}>
                       <input 
                         type="text" 
                         value={row.tank_type} 
@@ -375,10 +440,10 @@ export default function AdminPanel({ onSettingsUpdated }) {
                           newData[idx].tank_type = e.target.value;
                           setGeneralPriceData(newData);
                         }}
-                        style={{ width: '100%', padding: '4px' }}
+                        className={styles.priceInput}
                       />
                     </td>
-                    <td style={{ padding: '4px', border: '1px solid #ddd' }}>
+                    <td className={styles.colComposition}>
                       <input 
                         type="text" 
                         value={row.composition} 
@@ -387,44 +452,64 @@ export default function AdminPanel({ onSettingsUpdated }) {
                           newData[idx].composition = e.target.value;
                           setGeneralPriceData(newData);
                         }}
-                        style={{ width: '100%', padding: '4px' }}
+                        className={styles.priceInput}
                       />
                     </td>
-                    <td style={{ padding: '4px', border: '1px solid #ddd' }}>
+                    <td className={styles.priceCol}>
                       <input 
-                        type="number" 
-                        value={row.price_kit} 
+                        type="text" 
+                        value={row.price_kit === 0 ? '0' : (row.price_kit ? row.price_kit.toLocaleString('ru-RU') : '')} 
                         onChange={(e) => {
+                          const val = parseInt(e.target.value.replace(/\D/g, ''), 10);
                           const newData = [...generalPriceData];
-                          newData[idx].price_kit = Number(e.target.value);
+                          newData[idx].price_kit = isNaN(val) ? 0 : val;
                           setGeneralPriceData(newData);
                         }}
-                        style={{ width: '100%', padding: '4px' }}
+                        className={styles.priceInput}
+                        style={{ textAlign: 'right' }}
                       />
                     </td>
-                    <td style={{ padding: '4px', border: '1px solid #ddd' }}>
+                    <td className={styles.priceCol}>
                       <input 
-                        type="number" 
-                        value={row.price_install} 
+                        type="text" 
+                        value={row.price_install === 0 ? '0' : (row.price_install ? row.price_install.toLocaleString('ru-RU') : '')} 
                         onChange={(e) => {
+                          const val = parseInt(e.target.value.replace(/\D/g, ''), 10);
                           const newData = [...generalPriceData];
-                          newData[idx].price_install = Number(e.target.value);
+                          newData[idx].price_install = isNaN(val) ? 0 : val;
                           setGeneralPriceData(newData);
                         }}
-                        style={{ width: '100%', padding: '4px' }}
+                        className={styles.priceInput}
+                        style={{ textAlign: 'right' }}
                       />
                     </td>
-                    <td style={{ padding: '4px', border: '1px solid #ddd', textAlign: 'center' }}>
-                      <button 
-                        className={styles.deleteBtn}
-                        onClick={() => {
-                          const newData = generalPriceData.filter((_, i) => i !== idx);
-                          setGeneralPriceData(newData);
-                        }}
-                        style={{ padding: '2px 8px', backgroundColor: '#ff4d4f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                      >
-                        ✕
-                      </button>
+                    <td className={styles.colAction}>
+                      <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                        <button 
+                          className={styles.iconBtn}
+                          onClick={() => {
+                            const newData = [...generalPriceData];
+                            newData.splice(idx + 1, 0, { ...row });
+                            setGeneralPriceData(newData);
+                          }}
+                          title="Копировать строку"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                          </svg>
+                        </button>
+                        <button 
+                          className={styles.deleteRowBtn}
+                          onClick={() => {
+                            const newData = generalPriceData.filter((_, i) => i !== idx);
+                            setGeneralPriceData(newData);
+                          }}
+                          title="Удалить строку"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -455,68 +540,56 @@ export default function AdminPanel({ onSettingsUpdated }) {
               </div>
 
               {generalPriceNotes.length === 0 ? (
-                <p style={{ color: '#888', fontSize: '0.9rem', margin: 0 }}>Нет добавленных примечаний.</p>
+                <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+                  Нет примечаний
+                </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  {generalPriceNotes.map((note, index) => (
-                    <div key={note.id} style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: 'white', position: 'relative' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }}>
-                          <div className={styles.toggleSwitch} style={{ transform: 'scale(0.8)', marginRight: '8px' }}>
-                            <input 
-                              type="checkbox" 
-                              checked={note.isEnabled}
-                              onChange={(e) => {
-                                const newNotes = [...generalPriceNotes];
-                                newNotes[index].isEnabled = e.target.checked;
-                                setGeneralPriceNotes(newNotes);
-                              }}
-                            />
-                            <span className={styles.toggleSlider}></span>
-                          </div>
-                          <span style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>{note.isEnabled ? 'Включено' : 'Выключено'}</span>
-                        </label>
+                  {sortedGeneralPriceNotes.map((note) => (
+                    <div key={note.id} className={`${styles.noteCard} ${note.position === 'above' ? styles.noteCardAbove : styles.noteCardBelow}`}>
+                      <div className={styles.noteHeader}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }}>
+                            <div className={styles.toggleSwitch} style={{ transform: 'scale(0.8)', marginRight: '8px' }}>
+                              <input 
+                                type="checkbox" 
+                                checked={note.isEnabled} 
+                                onChange={(e) => updateNote(note.id, 'isEnabled', e.target.checked)} 
+                              />
+                              <span className={styles.toggleSlider}></span>
+                            </div>
+                            <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: note.isEnabled ? '#10b981' : '#9ca3af' }}>
+                              {note.isEnabled ? 'Включено' : 'Выключено'}
+                            </span>
+                          </label>
+                          <span className={`${styles.noteBadge} ${note.position === 'above' ? styles.noteBadgeAbove : styles.noteBadgeBelow}`}>
+                            {note.position === 'above' ? 'Сверху' : 'Снизу'}
+                          </span>
+                        </div>
                         <button 
-                          onClick={() => {
-                            const newNotes = generalPriceNotes.filter((_, i) => i !== index);
-                            setGeneralPriceNotes(newNotes);
-                          }}
-                          style={{ backgroundColor: 'transparent', border: 'none', color: '#ff4d4f', cursor: 'pointer', fontSize: '1rem', padding: '0 5px' }}
+                          onClick={() => setGeneralPriceNotes(generalPriceNotes.filter(n => n.id !== note.id))} 
+                          className={styles.deleteRowBtn} 
                           title="Удалить примечание"
-                        >
-                          ✕
-                        </button>
+                        >✕</button>
                       </div>
-
-                      <div style={{ display: 'flex', gap: '15px', flexDirection: 'column' }}>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#555' }}>Расположение:</label>
-                          <select 
-                            value={note.position}
-                            onChange={(e) => {
-                              const newNotes = [...generalPriceNotes];
-                              newNotes[index].position = e.target.value;
-                              setGeneralPriceNotes(newNotes);
-                            }}
-                            style={{ padding: '6px', borderRadius: '4px', border: '1px solid #ccc', width: '100%', fontSize: '0.9rem' }}
-                          >
-                            <option value="above">Сверху таблицы (как заголовок)</option>
-                            <option value="below">Снизу таблицы (как примечание)</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label style={{ display: 'block', marginBottom: '5px', fontSize: '0.85rem', color: '#555' }}>Текст примечания:</label>
-                          <textarea 
-                            value={note.text}
-                            onChange={(e) => {
-                              const newNotes = [...generalPriceNotes];
-                              newNotes[index].text = e.target.value;
-                              setGeneralPriceNotes(newNotes);
-                            }}
-                            placeholder="Введите информацию..."
-                            style={{ width: '100%', minHeight: '60px', padding: '8px', borderRadius: '4px', border: '1px solid #ccc', resize: 'vertical', fontSize: '0.9rem' }}
-                          />
-                        </div>
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                        <select 
+                          value={note.position}
+                          onChange={(e) => updateNote(note.id, 'position', e.target.value)}
+                          className={styles.priceInput}
+                          style={{ width: 'fit-content', fontWeight: '500' }}
+                        >
+                          <option value="above">Расположение: Сверху таблицы</option>
+                          <option value="below">Расположение: Снизу таблицы</option>
+                        </select>
+                        <textarea 
+                          value={note.text}
+                          onChange={(e) => updateNote(note.id, 'text', e.target.value)}
+                          placeholder="Текст примечания..."
+                          className={styles.priceInput}
+                          style={{ minHeight: '60px', resize: 'vertical' }}
+                        />
                       </div>
                     </div>
                   ))}
@@ -524,7 +597,6 @@ export default function AdminPanel({ onSettingsUpdated }) {
               )}
             </div>
           </div>
-        )}
         
         <button 
           onClick={handleSavePrices} 

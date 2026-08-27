@@ -196,3 +196,215 @@
 .toggleSwitch input:checked + .toggleSlider:before {
   transform: translateX(22px);
 }
+
+/* General Price Table styles matching User UI */
+.priceTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.priceTable th,
+.priceTable td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.priceTable th {
+  color: #6b7280;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e5e7eb;
+  white-space: normal;
+  padding-bottom: 6px;
+  line-height: 1.3;
+}
+
+.priceTable th.priceCol,
+.priceTable td.priceCol {
+  text-align: right;
+  width: 120px;
+}
+
+.priceTable th.colType,
+.priceTable td.colType {
+  width: 100px;
+}
+
+.priceTable th.colTank,
+.priceTable td.colTank {
+  width: 120px;
+}
+
+.priceTable th.colComposition,
+.priceTable td.colComposition {
+  width: auto;
+  min-width: 180px;
+}
+
+.priceTable th.colAction,
+.priceTable td.colAction {
+  width: 80px;
+  text-align: center;
+}
+
+.priceTable th.colDrag,
+.priceTable td.colDrag {
+  width: 30px;
+  text-align: center;
+  color: #9ca3af;
+  cursor: grab;
+  padding: 0 4px;
+}
+
+.priceTable td.colDrag:active {
+  cursor: grabbing;
+}
+
+.priceTable tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.activePriceBanner {
+  background-color: #ecfdf5;
+  border: 1px solid #10b981;
+  color: #047857;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+
+.publishBtn {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-left: 15px;
+}
+
+.publishBtn:hover {
+  background-color: #059669;
+}
+
+.priceTable tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+/* Style inputs to blend in but indicate editability */
+.priceInput {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #fff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.priceInput:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: #e5e7eb;
+}
+
+.priceInput:focus {
+  background-color: #fff;
+  border-color: #ef4444; /* App accent red */
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.1);
+}
+
+.iconBtn {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconBtn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.deleteRowBtn {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 1.2rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.deleteRowBtn:hover {
+  background: #fef2f2;
+}
+
+/* Note Cards Styling */
+.noteCard {
+  padding: 16px;
+  border-radius: 8px;
+  background-color: white;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  border-left-width: 4px;
+  transition: all 0.2s;
+}
+
+.noteCardAbove {
+  border-left-color: #ef4444;
+}
+
+.noteCardBelow {
+  border-left-color: #3b82f6;
+}
+
+.noteBadge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.noteBadgeAbove {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.noteBadgeBelow {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.noteHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
