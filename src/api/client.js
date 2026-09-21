@@ -78,3 +78,14 @@ export function importCars(file) {
     return res.json();
   });
 }
+
+export function getPpData() {
+  return request('/pp');
+}
+
+export function updatePpData(data) {
+  return request('/pp', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}

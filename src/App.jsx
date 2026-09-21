@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getSettings, getPriceItems } from './api/client';
+import { getSettings, getPriceItems, getPpData } from './api/client';
 import { useCalculator } from './hooks/useCalculator';
 import Header from './components/Header/Header';
 import CarSelect from './components/CarSelect/CarSelect';
@@ -11,11 +11,15 @@ import StickyFooter from './components/StickyFooter/StickyFooter';
 import ProposalModal from './components/ProposalModal/ProposalModal';
 import AdminPanel from './components/AdminPanel/AdminPanel';
 import GeneralPriceView from './components/GeneralPriceView/GeneralPriceView';
+import PpPriceView from './components/PpPriceView/PpPriceView';
 import './App.css';
 
 export default function App() {
   const [settings, setSettings] = useState(null);
   const [priceItems, setPriceItems] = useState(null);
+  const [activeTab, setActiveTab] = useState('gbo');
+  const [ppData, setPpData] = useState(null);
+  const [loadingPp, setLoadingPp] = useState(true);
   const [showAdmin, setShowAdmin] = useState(false);
   const [showProposal, setShowProposal] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
@@ -50,15 +54,28 @@ export default function App() {
     }
   }, []);
 
+  const loadPpData = useCallback(async () => {
+    try {
+      const data = await getPpData();
+      setPpData(data);
+    } catch (err) {
+      console.error('Failed to load PP data:', err);
+    } finally {
+      setLoadingPp(false);
+    }
+  }, []);
+
   useEffect(() => {
     loadSettings();
     loadPriceItems();
-  }, [loadSettings, loadPriceItems]);
+    loadPpData();
+  }, [loadSettings, loadPriceItems, loadPpData]);
 
   // Called when admin updates data (import or settings change)
   function handleDataUpdated() {
     loadSettings();
     loadPriceItems();
+    loadPpData();
   }
 
   return (
@@ -67,6 +84,8 @@ export default function App() {
         settings={settings}
         showAdmin={showAdmin}
         onToggleAdmin={() => setShowAdmin(!showAdmin)}
+        activeTab={activeTab}
+        onTabChange={(tab) => setActiveTab(tab)}
       />
 
       <main className="main">
@@ -75,6 +94,12 @@ export default function App() {
             <AdminPanel
               settings={settings}
               onSettingsUpdated={handleDataUpdated}
+              initialTab={activeTab}
+            />
+          ) : activeTab === 'pp' ? (
+            <PpPriceView 
+              data={ppData} 
+              loading={loadingPp}
             />
           ) : settings?.isGeneralPriceEnabled ? (
             <GeneralPriceView 
@@ -158,7 +183,7 @@ export default function App() {
         gboFuelType={calc.gboFuelType}
         totalPrice={calc.totalPrice}
         onGenerateProposal={() => setShowProposal(true)}
-        visible={!showAdmin && !settings?.isGeneralPriceEnabled && !!calc.selectedSystem}
+        visible={!showAdmin && activeTab === 'gbo' && !settings?.isGeneralPriceEnabled && !!calc.selectedSystem}
       />
 
       <ProposalModal

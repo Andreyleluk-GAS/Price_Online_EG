@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { importPrices, importCars, updateSettings, getSettings } from '../../api/client';
 import ManualPriceModal from '../ManualPriceModal/ManualPriceModal';
+import PpAdminPanel from './PpAdminPanel';
 import styles from './AdminPanel.module.css';
 
-export default function AdminPanel({ onSettingsUpdated }) {
+export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
+  const [adminSection, setAdminSection] = useState(initialTab || 'gbo');
   const [priceGasoline92, setPriceGasoline92] = useState('');
   const [priceGasoline95, setPriceGasoline95] = useState('');
   const [pricePropane, setPricePropane] = useState('');
@@ -181,7 +183,28 @@ export default function AdminPanel({ onSettingsUpdated }) {
     <div className={styles.adminPanel}>
       <h2 className={styles.panelTitle}>Панель администратора</h2>
 
-      {/* File Upload */}
+      <div className={styles.sectionTabs}>
+        <button
+          type="button"
+          className={`${styles.sectionTabBtn} ${adminSection === 'gbo' ? styles.sectionTabBtnActive : ''}`}
+          onClick={() => setAdminSection('gbo')}
+        >
+          🔥 Прайс и настройки ГБО
+        </button>
+        <button
+          type="button"
+          className={`${styles.sectionTabBtn} ${adminSection === 'pp' ? styles.sectionTabBtnActive : ''}`}
+          onClick={() => setAdminSection('pp')}
+        >
+          ❄️ Прайс ПП (Предпусковые подогреватели)
+        </button>
+      </div>
+
+      {adminSection === 'pp' ? (
+        <PpAdminPanel onDataUpdated={onSettingsUpdated} />
+      ) : (
+        <>
+          {/* File Upload */}
       <div className={styles.block}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
           <h3 className={styles.blockTitle}>Импорт прайс-листа</h3>
@@ -607,6 +630,8 @@ export default function AdminPanel({ onSettingsUpdated }) {
           {saving ? 'Сохранение...' : 'Сохранить настройки общего прайса'}
         </button>
       </div>
+        </>
+      )}
 
       <ManualPriceModal 
         isOpen={isManualModalOpen} 

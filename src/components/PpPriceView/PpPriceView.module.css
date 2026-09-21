@@ -1,0 +1,474 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 70vh;
+  padding: 12px 16px 28px;
+  background-color: #f4f6f9;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.contentWrapper {
+  max-width: 1040px;
+  width: 100%;
+}
+
+/* Loading & Empty States */
+.loadingWrapper,
+.emptyWrapper {
+  text-align: center;
+  padding: 40px 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 12px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Header Area */
+.headerBlock {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.titleArea {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+}
+
+.titleImage {
+  max-width: 380px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.badgePill {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  border: 1px solid #bae6fd;
+}
+
+.mainTitle {
+  font-size: 1.22rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.headerControls {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+/* Date Badge */
+.dateBadge {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+  padding: 7px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #bfdbfe;
+}
+
+.dateLabel {
+  font-size: 0.6rem;
+  color: #3b82f6;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 0px;
+  line-height: 1.1;
+}
+
+.dateValue {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+/* VAT Switch */
+.vatToggleWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 3px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+}
+
+.vatLabel {
+  font-size: 0.76rem;
+  color: #64748b;
+  font-weight: 500;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.vatLabelActive {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.toggleSwitch {
+  position: relative;
+  width: 38px;
+  height: 20px;
+  background-color: #cbd5e1;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}
+
+.toggleSwitchActive {
+  background-color: #2563eb;
+}
+
+.toggleThumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggleSwitchActive .toggleThumb {
+  transform: translateX(18px);
+}
+
+/* VAT Alert Banner */
+.vatAlertBanner {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.05);
+}
+
+/* Section Card */
+.sectionCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  border: 1px solid #eef2f6;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid #f1f5f9;
+}
+
+.sectionIcon {
+  font-size: 1.3rem;
+  line-height: 1;
+  background: #f8fafc;
+  padding: 5px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.sectionTitle {
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.sectionSubtitle {
+  font-size: 0.76rem;
+  color: #64748b;
+  display: block;
+  margin-top: 1px;
+}
+
+/* Tables */
+.tableBlock {
+  width: 100%;
+}
+
+.tableTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tableResponsive {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.priceTable {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+  font-size: 0.88rem;
+  line-height: 1.2;
+}
+
+.priceTable thead tr {
+  background: #f8fafc;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+
+.priceTable th {
+  padding: 6px 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #475569;
+  text-align: left;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.priceTable th.centerCol {
+  text-align: center;
+}
+
+.priceTable th.totalHeader {
+  background: #ecfdf5;
+  color: #065f46;
+}
+
+.priceTable td {
+  padding: 4px 8px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #1e293b;
+  vertical-align: middle;
+  line-height: 1.25;
+}
+
+.priceTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.priceTable tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.centerCol {
+  text-align: center;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.nameCol {
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.priceCol {
+  text-align: right;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+.rateCol {
+  text-align: right;
+  font-weight: 500;
+  color: #475569;
+  white-space: nowrap;
+}
+
+.totalCol {
+  text-align: right;
+  font-weight: 800;
+  font-size: 0.98rem;
+  color: #065f46;
+  background: #f0fdf4;
+  white-space: nowrap;
+}
+
+/* Selection & Checkboxes */
+.priceTable th.checkboxHeader {
+  width: 44px;
+  text-align: center;
+  padding: 6px 0;
+}
+
+.priceTable td.checkboxCol {
+  text-align: center;
+  vertical-align: middle;
+  width: 44px;
+  padding: 4px 0;
+}
+
+.rowCheckbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #2563eb;
+  vertical-align: middle;
+  display: block;
+  margin: 0 auto;
+}
+
+.selectedRow {
+  background-color: #eff6ff !important;
+}
+
+.selectedRow td {
+  color: #1e3a8a;
+}
+
+/* Disabled Section (Mutual Exclusion) */
+.sectionDisabled {
+  opacity: 0.45;
+  filter: grayscale(0.85);
+  transition: all 0.3s ease;
+  position: relative;
+  user-select: none;
+}
+
+.sectionDisabled .rowCheckbox {
+  cursor: not-allowed;
+}
+
+.disabledBadge {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* Notes Block */
+.notesBlock {
+  margin-top: 12px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.notesHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 4px;
+}
+
+.notesList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.noteItem {
+  font-size: 0.85rem;
+  color: #334155;
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 8px 8px 20px;
+  }
+  .headerBlock {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .headerControls {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dateBadge {
+    width: 100%;
+  }
+  .vatToggleWrapper {
+    justify-content: center;
+  }
+  .sectionCard {
+    padding: 10px 8px;
+  }
+  .mainTitle {
+    font-size: 1.1rem;
+  }
+  .priceTable th, 
+  .priceTable td {
+    padding: 4px 6px;
+    font-size: 0.8rem;
+  }
+  .priceCol,
+  .totalCol {
+    font-size: 0.88rem;
+  }
+}
