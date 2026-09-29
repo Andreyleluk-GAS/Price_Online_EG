@@ -91,6 +91,25 @@ export default function GeneralPriceView({ data, settings }) {
           <tbody>
             {groupedData.map((row, idx) => {
               const total = (Number(row.price_kit) || 0) + (Number(row.price_install) || 0);
+
+              // Логика определения динамики цены:
+              // 1. Если в системе есть ранняя цена (prev_total):
+              //    - выросла -> 'up' (красная стрелка вверх)
+              //    - снизилась -> 'down' (зеленая стрелка вниз)
+              //    - не изменилась -> 'same' (синий прочерк)
+              // 2. Если система не знает, какая была цена ранее -> '-' (синий прочерк)
+              let trend = 'same';
+              if (row.prev_total !== null && row.prev_total !== undefined) {
+                const prev = Number(row.prev_total);
+                if (!isNaN(prev)) {
+                  if (total > prev) trend = 'up';
+                  else if (total < prev) trend = 'down';
+                  else trend = 'same';
+                }
+              } else if (row.trend && row.trend !== 'auto') {
+                trend = row.trend;
+              }
+
               return (
                 <tr key={idx} className={styles[`group${row.groupIndex}`]}>
                   {row.isFirstInGroup && (
@@ -102,7 +121,35 @@ export default function GeneralPriceView({ data, settings }) {
                   <td className={`${styles.hideOnMobile} ${styles.colLeft} ${styles.colRegular}`}>{row.composition}</td>
                   <td className={styles.hideOnMobile}>{Number(row.price_kit).toLocaleString('ru-RU')}</td>
                   <td className={styles.hideOnMobile}>{Number(row.price_install).toLocaleString('ru-RU')}</td>
-                  <td className={styles.totalCol}>{total.toLocaleString('ru-RU')}</td>
+                  <td className={styles.totalCol}>
+                    <div className={styles.totalCellContent}>
+                      <span className={styles.totalAmount}>{total.toLocaleString('ru-RU')}</span>
+                      <span 
+                        className={`${styles.trendIcon} ${
+                          trend === 'up' ? styles.trendUp : trend === 'down' ? styles.trendDown : styles.trendSame
+                        }`}
+                        title={trend === 'up' ? 'Цена увеличилась' : trend === 'down' ? 'Цена уменьшилась' : 'Цена без изменений'}
+                      >
+                        {trend === 'up' && (
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="19" x2="12" y2="5" />
+                            <polyline points="5 12 12 5 19 12" />
+                          </svg>
+                        )}
+                        {trend === 'down' && (
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <polyline points="19 12 12 19 5 12" />
+                          </svg>
+                        )}
+                        {trend === 'same' && (
+                          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        )}
+                      </span>
+                    </div>
+                  </td>
                 </tr>
               );
             })}

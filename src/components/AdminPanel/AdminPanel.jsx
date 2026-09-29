@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { importPrices, importCars, updateSettings, getSettings } from '../../api/client';
 import ManualPriceModal from '../ManualPriceModal/ManualPriceModal';
 import PpAdminPanel from './PpAdminPanel';
+import BackupAdminPanel from './BackupAdminPanel';
 import styles from './AdminPanel.module.css';
 
 export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
@@ -72,16 +73,19 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
           }
           
           if (data.generalPriceData && data.generalPriceData.length > 0) {
-            setGeneralPriceData(data.generalPriceData);
+            setGeneralPriceData(data.generalPriceData.map(r => ({
+              ...r,
+              _initialTotal: (Number(r.price_kit) || 0) + (Number(r.price_install) || 0)
+            })));
           } else {
             // Default rows from screenshot if empty
             setGeneralPriceData([
-              { vehicle_type: '4 цил.', tank_type: 'баллон до 60 л.', composition: 'комплект + баллон + установка', price_kit: 55000, price_install: 34000 },
-              { vehicle_type: '6 цил.', tank_type: 'баллон до 60 л.', composition: 'комплект + баллон + установка', price_kit: 100000, price_install: 48000 },
-              { vehicle_type: '6 цил.', tank_type: 'баллон 73 л.', composition: 'комплект + баллон + установка', price_kit: 125000, price_install: 48000 },
-              { vehicle_type: '6 цил.', tank_type: 'баллон 93 л.', composition: 'комплект + баллон + установка', price_kit: 145000, price_install: 48000 },
-              { vehicle_type: '8 цил.', tank_type: 'баллон 73 л.', composition: 'комплект + баллон + установка', price_kit: 130000, price_install: 58000 },
-              { vehicle_type: '8 цил.', tank_type: 'баллон 93 л.', composition: 'комплект + баллон + установка', price_kit: 150000, price_install: 58000 }
+              { vehicle_type: '4 цил.', tank_type: 'баллон до 60 л.', composition: 'комплект + баллон + установка', price_kit: 55000, price_install: 34000, _initialTotal: 89000, prev_total: null, trend: 'same' },
+              { vehicle_type: '6 цил.', tank_type: 'баллон до 60 л.', composition: 'комплект + баллон + установка', price_kit: 100000, price_install: 48000, _initialTotal: 148000, prev_total: null, trend: 'same' },
+              { vehicle_type: '6 цил.', tank_type: 'баллон 73 л.', composition: 'комплект + баллон + установка', price_kit: 125000, price_install: 48000, _initialTotal: 173000, prev_total: null, trend: 'same' },
+              { vehicle_type: '6 цил.', tank_type: 'баллон 93 л.', composition: 'комплект + баллон + установка', price_kit: 145000, price_install: 48000, _initialTotal: 193000, prev_total: null, trend: 'same' },
+              { vehicle_type: '8 цил.', tank_type: 'баллон 73 л.', composition: 'комплект + баллон + установка', price_kit: 130000, price_install: 58000, _initialTotal: 188000, prev_total: null, trend: 'same' },
+              { vehicle_type: '8 цил.', tank_type: 'баллон 93 л.', composition: 'комплект + баллон + установка', price_kit: 150000, price_install: 58000, _initialTotal: 208000, prev_total: null, trend: 'same' }
             ]);
           }
         }
@@ -159,6 +163,13 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
       });
       setUpdatedAt(res.fuel_prices_updated_at);
       setSavedIsGeneralPriceEnabled(isGeneralPriceEnabled);
+      if (res?.data?.generalPriceData || res?.generalPriceData) {
+        const savedRows = res.data?.generalPriceData || res.generalPriceData;
+        setGeneralPriceData(savedRows.map(r => ({
+          ...r,
+          _initialTotal: (Number(r.price_kit) || 0) + (Number(r.price_install) || 0)
+        })));
+      }
       setSaveResult({ success: true, message: 'Цены обновлены' });
       if (onSettingsUpdated) onSettingsUpdated();
     } catch (err) {
@@ -167,6 +178,44 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
       setSaving(false);
     }
   }
+
+  const handlePriceFieldChange = (idx, field, rawValue) => {
+    const val = parseInt(rawValue.replace(/\D/g, ''), 10);
+    const numVal = isNaN(val) ? 0 : val;
+    const newData = [...generalPriceData];
+    const currentRow = { ...newData[idx], [field]: numVal };
+
+    const kit = field === 'price_kit' ? numVal : (Number(currentRow.price_kit) || 0);
+    const install = field === 'price_install' ? numVal : (Number(currentRow.price_install) || 0);
+    const newTotal = kit + install;
+
+    // Ранняя цена для сравнения:
+    // 1. Исходная цена при загрузке или последнем сохранении (_initialTotal)
+    // 2. Либо зафиксированная ранее цена (prev_total)
+    const earlierPrice = (currentRow._initialTotal !== undefined && currentRow._initialTotal !== null)
+      ? Number(currentRow._initialTotal)
+      : (currentRow.prev_total !== undefined && currentRow.prev_total !== null ? Number(currentRow.prev_total) : null);
+
+    if (earlierPrice !== null && !isNaN(earlierPrice)) {
+      if (newTotal > earlierPrice) {
+        currentRow.trend = 'up';
+        currentRow.prev_total = earlierPrice;
+      } else if (newTotal < earlierPrice) {
+        currentRow.trend = 'down';
+        currentRow.prev_total = earlierPrice;
+      } else {
+        currentRow.trend = 'same';
+        currentRow.prev_total = earlierPrice;
+      }
+    } else {
+      // Система не знает какие были ранее цены -> '-'
+      currentRow.trend = 'same';
+      currentRow.prev_total = null;
+    }
+
+    newData[idx] = currentRow;
+    setGeneralPriceData(newData);
+  };
 
   const sortedGeneralPriceNotes = [...generalPriceNotes].sort((a, b) => {
     if (a.position === b.position) return 0;
@@ -198,10 +247,19 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
         >
           ❄️ Прайс ПП (Предпусковые подогреватели)
         </button>
+        <button
+          type="button"
+          className={`${styles.sectionTabBtn} ${adminSection === 'backup' ? styles.sectionTabBtnActive : ''}`}
+          onClick={() => setAdminSection('backup')}
+        >
+          📦 Резервные копии и синхронизация
+        </button>
       </div>
 
       {adminSection === 'pp' ? (
         <PpAdminPanel onDataUpdated={onSettingsUpdated} />
+      ) : adminSection === 'backup' ? (
+        <BackupAdminPanel onDataUpdated={onSettingsUpdated} />
       ) : (
         <>
           {/* File Upload */}
@@ -418,6 +476,7 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
                   <th className={styles.colComposition}>Состав</th>
                   <th className={styles.priceCol}>Стоимость комплект</th>
                   <th className={styles.priceCol}>Стоимость установка</th>
+                  <th style={{ width: '130px', textAlign: 'center' }}>Динамика</th>
                   <th className={styles.colAction} title="Действия">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'block', margin: '0 auto' }}>
                       <path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
@@ -482,12 +541,7 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
                       <input 
                         type="text" 
                         value={row.price_kit === 0 ? '0' : (row.price_kit ? row.price_kit.toLocaleString('ru-RU') : '')} 
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value.replace(/\D/g, ''), 10);
-                          const newData = [...generalPriceData];
-                          newData[idx].price_kit = isNaN(val) ? 0 : val;
-                          setGeneralPriceData(newData);
-                        }}
+                        onChange={(e) => handlePriceFieldChange(idx, 'price_kit', e.target.value)}
                         className={styles.priceInput}
                         style={{ textAlign: 'right' }}
                       />
@@ -496,15 +550,33 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
                       <input 
                         type="text" 
                         value={row.price_install === 0 ? '0' : (row.price_install ? row.price_install.toLocaleString('ru-RU') : '')} 
-                        onChange={(e) => {
-                          const val = parseInt(e.target.value.replace(/\D/g, ''), 10);
-                          const newData = [...generalPriceData];
-                          newData[idx].price_install = isNaN(val) ? 0 : val;
-                          setGeneralPriceData(newData);
-                        }}
+                        onChange={(e) => handlePriceFieldChange(idx, 'price_install', e.target.value)}
                         className={styles.priceInput}
                         style={{ textAlign: 'right' }}
                       />
+                    </td>
+                    <td style={{ textAlign: 'center', width: '130px' }}>
+                      <select 
+                        value={row.trend || 'same'} 
+                        onChange={(e) => {
+                          const newData = [...generalPriceData];
+                          newData[idx].trend = e.target.value;
+                          setGeneralPriceData(newData);
+                        }}
+                        className={styles.priceInput}
+                        style={{
+                          padding: '4px 6px',
+                          fontSize: '0.82rem',
+                          fontWeight: '700',
+                          color: row.trend === 'up' ? '#dc2626' : row.trend === 'down' ? '#16a34a' : '#2563eb',
+                          backgroundColor: row.trend === 'up' ? '#fef2f2' : row.trend === 'down' ? '#f0fdf4' : '#eff6ff',
+                          borderColor: row.trend === 'up' ? '#fca5a5' : row.trend === 'down' ? '#86efac' : '#bfdbfe'
+                        }}
+                      >
+                        <option value="up">▲ Вверх (красный)</option>
+                        <option value="down">▼ Вниз (зеленый)</option>
+                        <option value="same">— Без изм. (синий)</option>
+                      </select>
                     </td>
                     <td className={styles.colAction}>
                       <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
@@ -512,7 +584,7 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
                           className={styles.iconBtn}
                           onClick={() => {
                             const newData = [...generalPriceData];
-                            newData.splice(idx + 1, 0, { ...row });
+                            newData.splice(idx + 1, 0, { ...row, prev_total: null, trend: 'same', _initialTotal: null });
                             setGeneralPriceData(newData);
                           }}
                           title="Копировать строку"
@@ -540,7 +612,7 @@ export default function AdminPanel({ onSettingsUpdated, initialTab = 'gbo' }) {
             </table>
             <button 
               onClick={() => {
-                setGeneralPriceData([...generalPriceData, { vehicle_type: '', tank_type: '', composition: '', price_kit: 0, price_install: 0 }]);
+                setGeneralPriceData([...generalPriceData, { vehicle_type: '', tank_type: '', composition: '', price_kit: 0, price_install: 0, prev_total: null, trend: 'same', _initialTotal: null }]);
               }}
               style={{ marginTop: '10px', padding: '6px 12px', cursor: 'pointer' }}
               className="btn-secondary"

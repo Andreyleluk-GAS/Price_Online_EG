@@ -89,3 +89,41 @@ export function updatePpData(data) {
     body: JSON.stringify(data),
   });
 }
+
+export function getBackupStatus() {
+  return request('/backup/status');
+}
+
+export function listBackups() {
+  return request('/backup/list');
+}
+
+export function createServerBackup(label = 'manual') {
+  return request('/backup/create', {
+    method: 'POST',
+    body: JSON.stringify({ label }),
+  });
+}
+
+export function restoreServerBackup(filename) {
+  return request('/backup/restore', {
+    method: 'POST',
+    body: JSON.stringify({ filename }),
+  });
+}
+
+export function importBackupData(payload) {
+  return request('/backup/import', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteServerBackup(filename) {
+  return request('/backup/delete', {
+    method: 'POST',
+    body: JSON.stringify({ filename }),
+  });
+}
+
+
