@@ -1,4 +1,5 @@
 import React from 'react';
+import gboLogo from '../../assets/gbo.png';
 import styles from './GeneralPriceView.module.css';
 
 export default function GeneralPriceView({ data, settings }) {
@@ -53,6 +54,25 @@ export default function GeneralPriceView({ data, settings }) {
     <div className={styles.container}>
       <div className={styles.tableWrapper}>
         
+        <div className={styles.headerBlock}>
+          <div className={styles.titleArea}>
+            <img 
+              src={gboLogo} 
+              alt="EliteGasPrice ГБО" 
+              className={styles.titleImage} 
+            />
+          </div>
+
+          <div className={styles.headerControls}>
+            <div className={styles.dateBadgeWrapper}>
+              <div className={styles.dateBadge}>
+                <span className={styles.dateLabel}>ЦЕНЫ ДЕЙСТВИТЕЛЬНЫ С:</span>
+                <span className={styles.dateValue}>{dateStr}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {aboveNotes.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '12px' }}>
             {aboveNotes.map(note => {
@@ -69,13 +89,6 @@ export default function GeneralPriceView({ data, settings }) {
             })}
           </div>
         )}
-
-        <div className={styles.dateBadgeWrapper}>
-          <div className={styles.dateBadge}>
-            <span className={styles.dateLabel}>ЦЕНЫ ДЕЙСТВИТЕЛЬНЫ С:</span>
-            <span className={styles.dateValue}>{dateStr}</span>
-          </div>
-        </div>
 
         <table className={styles.priceTable}>
           <thead>

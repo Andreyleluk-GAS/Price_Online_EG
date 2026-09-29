@@ -452,47 +452,86 @@ export default function PpAdminPanel({ onDataUpdated }) {
           <button
             type="button"
             className={styles.addBtn}
-            onClick={() => setNotes([...notes, { id: `note-${Date.now()}`, text: '', isEnabled: true }])}
+            onClick={() => setNotes([...notes, { id: `note-${Date.now()}`, text: '', position: 'below', isEnabled: true }])}
           >
             + Добавить примечание
           </button>
         </div>
-        <div className={styles.notesList}>
-          {notes.map((note, idx) => (
-            <div key={note.id || idx} className={styles.noteRow}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={note.isEnabled}
-                  onChange={(e) => {
-                    const copy = [...notes];
-                    copy[idx].isEnabled = e.target.checked;
-                    setNotes(copy);
-                  }}
-                />
-                <span>Включено</span>
-              </label>
-              <textarea
-                value={note.text}
-                onChange={(e) => {
-                  const copy = [...notes];
-                  copy[idx].text = e.target.value;
-                  setNotes(copy);
-                }}
-                placeholder="Текст примечания..."
-                className={styles.textarea}
-              />
-              <button
-                type="button"
-                className={styles.delBtn}
-                onClick={() => setNotes(notes.filter((_, i) => i !== idx))}
-                title="Удалить примечание"
-              >
-                ✕
-              </button>
-            </div>
-          ))}
-        </div>
+
+        {notes.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '20px', color: '#6b7280' }}>
+            Нет примечаний
+          </div>
+        ) : (
+          <div className={styles.notesList}>
+            {[...notes].sort((a, b) => {
+              if (a.position === b.position) return 0;
+              return a.position === 'above' ? -1 : 1;
+            }).map((note) => {
+              const idx = notes.findIndex(n => n.id === note.id);
+              return (
+                <div key={note.id} className={`${styles.noteCard} ${note.position === 'above' ? styles.noteCardAbove : styles.noteCardBelow}`}>
+                  <div className={styles.noteHeader}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', userSelect: 'none' }}>
+                        <div className={styles.toggleSwitch} style={{ marginRight: '8px' }}>
+                          <input
+                            type="checkbox"
+                            checked={note.isEnabled}
+                            onChange={(e) => {
+                              const copy = [...notes];
+                              copy[idx].isEnabled = e.target.checked;
+                              setNotes(copy);
+                            }}
+                          />
+                          <span className={styles.toggleSlider}></span>
+                        </div>
+                        <span style={{ fontSize: '0.9rem', fontWeight: 'bold', color: note.isEnabled ? '#10b981' : '#9ca3af' }}>
+                          {note.isEnabled ? 'Включено' : 'Выключено'}
+                        </span>
+                      </label>
+                      <span className={`${styles.noteBadge} ${note.position === 'above' ? styles.noteBadgeAbove : styles.noteBadgeBelow}`}>
+                        {note.position === 'above' ? 'Сверху' : 'Снизу'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setNotes(notes.filter(n => n.id !== note.id))}
+                      className={styles.delBtn}
+                      title="Удалить примечание"
+                    >✕</button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <select
+                      value={note.position}
+                      onChange={(e) => {
+                        const copy = [...notes];
+                        copy[idx].position = e.target.value;
+                        setNotes(copy);
+                      }}
+                      className={styles.input}
+                      style={{ width: 'fit-content', fontWeight: '500' }}
+                    >
+                      <option value="above">Расположение: Сверху таблицы</option>
+                      <option value="below">Расположение: Снизу таблицы</option>
+                    </select>
+                    <textarea
+                      value={note.text}
+                      onChange={(e) => {
+                        const copy = [...notes];
+                        copy[idx].text = e.target.value;
+                        setNotes(copy);
+                      }}
+                      placeholder="Текст примечания..."
+                      className={styles.textarea}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>

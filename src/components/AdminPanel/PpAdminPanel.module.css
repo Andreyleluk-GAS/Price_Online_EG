@@ -211,34 +211,105 @@
 .notesList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 15px;
 }
 
-.noteRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px;
-  background: #f8fafc;
+/* Note Cards (full-featured, matching ГБО) */
+.noteCard {
+  padding: 16px;
   border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  background-color: white;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #e5e7eb;
+  border-left-width: 4px;
+  transition: all 0.2s;
 }
 
-.checkboxLabel {
+.noteCardAbove {
+  border-left-color: #ef4444;
+}
+
+.noteCardBelow {
+  border-left-color: #3b82f6;
+}
+
+.noteHeader {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.noteBadge {
+  font-size: 0.75rem;
   font-weight: 600;
-  color: #475569;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.noteBadgeAbove {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.noteBadgeBelow {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* Toggle Switch */
+.toggleSwitch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.toggleSwitch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggleSlider {
+  position: absolute;
   cursor: pointer;
-  white-space: nowrap;
-  padding-top: 6px;
+  inset: 0;
+  background-color: #d1d5db;
+  border-radius: 22px;
+  transition: 0.3s;
+}
+
+.toggleSlider::before {
+  content: '';
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+  background-color: #10b981;
+}
+
+.toggleSwitch input:checked + .toggleSlider::before {
+  transform: translateX(16px);
 }
 
 .textarea {
   flex: 1;
-  min-height: 54px;
+  min-height: 60px;
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 6px;
@@ -247,6 +318,8 @@
   resize: vertical;
   outline: none;
   font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .textarea:focus {

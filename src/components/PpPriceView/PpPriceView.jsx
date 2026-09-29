@@ -57,6 +57,8 @@ export default function PpPriceView({ data, loading }) {
   const equipmentCargo = data.equipmentCargo || [];
   const worksCargo = data.worksCargo || [];
   const activeNotes = (data.notes || []).filter(n => n.isEnabled);
+  const aboveNotes = activeNotes.filter(n => n.position === 'above');
+  const belowNotes = activeNotes.filter(n => !n.position || n.position === 'below');
 
   // Selection mutual exclusion logic
   const hasPassengerSelected = selectedPassengerEq.length > 0 || selectedPassengerWorks.length > 0;
@@ -185,6 +187,24 @@ export default function PpPriceView({ data, loading }) {
               <line x1="12" y1="16" x2="12.01" y2="16"></line>
             </svg>
             <span>Цены в таблицах указаны при продаже от ООО «АТС» с НДС 22%</span>
+          </div>
+        )}
+
+        {/* Примечания СВЕРХУ */}
+        {aboveNotes.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginBottom: '10px' }}>
+            {aboveNotes.map((note, idx) => {
+              const lines = note.text.split('\n');
+              const title = lines.shift();
+              return (
+                <div key={note.id || idx} className={styles.topNote}>
+                  {title && <span className={styles.topNoteTitle}>{title}</span>}
+                  {lines.map((line, i) => (
+                    <span key={i}>{line}<br /></span>
+                  ))}
+                </div>
+              );
+            })}
           </div>
         )}
 
@@ -406,23 +426,22 @@ export default function PpPriceView({ data, loading }) {
           </div>
         </div>
 
-        {/* 3. Блок ПРИМЕЧАНИЙ */}
-        {activeNotes.length > 0 && (
+        {/* 3. Блок ПРИМЕЧАНИЙ СНИЗУ */}
+        {belowNotes.length > 0 && (
           <div className={styles.notesBlock}>
-            <div className={styles.notesHeader}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-              </svg>
-              <span>ПРИМЕЧАНИЕ:</span>
-            </div>
             <div className={styles.notesList}>
-              {activeNotes.map((note, idx) => (
-                <div key={note.id || idx} className={styles.noteItem}>
-                  {note.text}
-                </div>
-              ))}
+              {belowNotes.map((note, idx) => {
+                const lines = note.text.split('\n');
+                const title = lines.shift();
+                return (
+                  <div key={note.id || idx} className={styles.noteItem}>
+                    {title && <span className={styles.noteItemTitle}>{title}</span>}
+                    {lines.map((line, i) => (
+                      <span key={i}>{line}<br /></span>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
